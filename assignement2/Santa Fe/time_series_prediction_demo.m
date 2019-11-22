@@ -29,7 +29,7 @@ for it = [1:iteration],
             ttr = con2seq(Ytr);
             
             %creation of networks
-            net1=feedforwardnet(neurons,'trainlm');
+            net1=feedforwardnet(neurons,'traincgf');
             
             %training and simulation
             net1.trainParam.epochs = 50;
