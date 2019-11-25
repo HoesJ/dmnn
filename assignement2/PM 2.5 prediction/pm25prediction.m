@@ -19,7 +19,7 @@ for it = 1:iteration
                 
                 topology = ones(1,layers(i))*neurons(j);
                 alg = 'trainlm';
-                [net, time] = trainModel(topology, alg, Xtr,Ytr);
+                [net, time] = trainModel(topology, alg, con2seq(Xtr),con2seq(Ytr));
                 [err, ~] = evalModel(net, Xtr(:,end), Xpred);
                 
                 times(k,j,i) = (times(k,j,i) * (it-1) + time) / it;
