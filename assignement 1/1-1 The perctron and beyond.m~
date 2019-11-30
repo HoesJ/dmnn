@@ -1,16 +1,9 @@
 %% 1
 x = 0:0.05:1;
-y = x + 0.2*randn(1, length(x));
+y = x + randn(1, length(x));
+plot(x,y);
 
-X = [ ones(length(x),1) x(:)];
-a = (X.'*X)\(X.'*y(:));
-linreg = a(1) + a(2) * x;
-
-hold on
-scatter(x,y);
-plot(x,linreg);
-hold off
-% p = newp(x,y,'
+% p = newp(
 %% 2
 x = linspace(0,1,21);
 y = -sin(.8*pi*x);
