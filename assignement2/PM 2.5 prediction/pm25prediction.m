@@ -2,12 +2,13 @@ load('shanghai2017.mat');
 preprocessing
 
 iteration = 10;
+epochs = 5:5:25;
 lags = 25:5:100;
 neurons = 10:10:50;
-layers = 1:1:5;
+layers = 1:1:3;
 
-errors = zeros(length(lags), length(neurons), length(layers));
-times = zeros(length(lags), length(neurons), length(layers));
+errors = zeros(length(epochs), length(lags), length(neurons), length(layers));
+times = zeros(length(epochs), length(lags), length(neurons), length(layers));
 
 test = con2seq(Xpred);
 
@@ -16,15 +17,17 @@ for it = 1:iteration
         for j = 1:length(neurons)
             for k = 1:length(lags)
                 [Xtr, Ytr] = getTimeSeriesTrainData(Xtrain, lags(k));
-                
-                topology = ones(1,layers(i))*neurons(j);
-                alg = 'trainlm';
-                [net, time] = trainModel(topology, alg, Xtr,Ytr);
-                [err, ~] = evalModel(net, Xtr(:,end), Xpred);
-                
-                times(k,j,i) = (times(k,j,i) * (it-1) + time) / it;
-                errors(k,j,i) = (errors(k,j,i) * (it-1) + err) / it;
-                fprintf('%d = The MSE of lag %d and neurons %d, layers %d is %f \n', it, lags(k), neurons(j), layers(i), err);
+                for l = 1:length(epochs)
+                    topology = ones(1,layers(i))*neurons(j);
+                    alg = 'trainlm';
+                    epoch = epochs(l);
+                    [net, time] = trainModel(topology, alg, epoch, con2seq(Xtr),con2seq(Ytr));
+                    [err, ~] = evalModel(net, Xtr(:,end), Xpred);
+
+                    times(l,k,j,i) = (times(l,k,j,i) * (it-1) + time) / it;
+                    errors(l,k,j,i) = (errors(l,k,j,i) * (it-1) + err) / it;
+                    fprintf('%d = The MSE of lag %d and neurons %d, layers %d, epoch %d is %f \n', it, lags(k), neurons(j), layers(i), epoch, err);
+                end
             end
         end
     end

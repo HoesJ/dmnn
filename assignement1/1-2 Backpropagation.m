@@ -141,19 +141,13 @@ scatter3(testSet(1,:), testSet(2,:), testSet(3,:),'.');
 hold off
 
 %% Define network
-p = trainSet(1:2,:);
-t = trainSet(3,:);
-net = fitnet(50, 'trainlm');
-net.inputs{1}.processFcns = {};
-net.outputs{2}.processFcns = {};
-net = configure(net,p,t);
-view(net)
+p = [trainSet(1:2,:),valSet(1:2,:),testSet(1:2,:)];
+t = [trainSet(3,:),valSet(3,:),testSet(3,:)];
 
-prev_error = 1e20;
-curr_error = 1e19;
-while (curr_error < prev_error)
-   [net,Y,E] = adapt(net,p,t);
-   prev_error = curr_error;
-   curr_error = sse(sim(net,valSet(1:2,:)) - valSet(3,:))
-   curr_error - prev_error
-end
+net = fitnet(50, 'trainlm');
+net.divideFcn = 'divideind';
+net.divideParam.trainInd = 1:1000
+net.divideParam.valInd = 1001:2000;
+net.divideParam.testInd = 2001:3000;
+
+net = train(net,(p),(t));
