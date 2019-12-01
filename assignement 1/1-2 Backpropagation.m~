@@ -88,7 +88,7 @@ for i = 1:length(numdatas)
     x = linspace(0, 3 * pi, numdatas(i)); % input
     y = sin(x.^2); % output
     p = con2seq(x); % converts the input to a best format for the toolbox
-    t = con2seq(y); % converts the output to a best format for the toolbox
+    t = con2seq(y + 0.3*randn(1, length(y))); % converts the output to a best format for the toolbox
 
     net = feedforwardnet(50, 'traincgp');
     net.iw{1, 1} = default.iw{1, 1}; % sets the same weights for both networks
@@ -114,12 +114,13 @@ end
 %% Compare training to vars
 clear all; clc;
 
-x = 0:0.05:3 * pi; % input
+x = linspace(0.05,3*pi,75); % input
 y = sin(x.^2); % output
 
 algs = ["traingd", "traingda", "traincgf", "traincgp", "trainbfg", "trainlm"];
-vars = 2:3:100;
+vars = 5:5:100;
 default = feedforwardnet(50, 'traingd'); % creates a first net with the 'trainlm' algorithm
+
 Rs = zeros(length(vars), length(algs));
 times = zeros(length(vars), length(algs));
 for it = 1:10
@@ -132,11 +133,11 @@ for i = 1:length(algs)
         net.b{2} = default.b{2};
 
         p = con2seq(x);
-%         noisy_y = y + vars(j) * randn(1, length(y));
-%         t = con2seq(noisy_y);
-        t = con2seq(y);
+        noisy_y = y + vars(j) * randn(1, length(y));
+        t = con2seq(noisy_y);
+%         t = con2seq(y);
         net.trainParam.showWindow = 0;
-        net.trainParam.epochs = vars(j); % set the number of epochs for the training (network 1)
+        net.trainParam.epochs = 40; % set the number of epochs for the training (network 1)
         tic
         net = train(net, p, t); % train network 1
         time = toc;
@@ -158,9 +159,10 @@ legend(fliplr(algs));
 %%
 load('Rs_epochs');
 figure;
-subplot(2,1,1); plot(
+subplot(2,1,1); plot(2:3:100, fliplr(Rs_epochs), 'linewidth',2); xlabel('epochs'); ylabel("Correlation coefficient"); legend(fliplr(algs)); title('Performance');
+subplot(2,1,2); plot(2:3:100, fliplr(times_epochs), 'linewidth',2); xlabel('epochs'); ylabel("training time [s]"); legend(fliplr(algs)); title('Time');
 
-load('Rs_noise_10ep.mat'); load('Rs_noise_40ep.mat'); 
+load('Rs_noise_10ep190p.mat'); load('Rs_noise_40ep190p.mat'); 
 figure;
 subplot(2,1,1); plot(0.1:0.02:0.9,fliplr(Rs_noise_10ep),'linewidth',2); xlabel("noise rate"); ylabel("Correlation coefficient"); legend(fliplr(algs)); title('Training using 10 epochs');
 subplot(2,1,2); plot(0.1:0.02:0.9,fliplr(Rs_noise_40ep),'linewidth',2); xlabel("noise rate"); ylabel("Correlation coefficient"); legend(fliplr(algs)); title('Training using 40 epochs');
@@ -194,20 +196,44 @@ scatter3(testSet(1, :), testSet(2, :), testSet(3, :), '.');
 hold off
 
 %% Define network
-p = trainSet(1:2, :);
-t = trainSet(3, :);
-net = fitnet(50, 'trainlm');
-net.inputs{1}.processFcns = {};
-net.outputs{2}.processFcns = {};
-net = configure(net, p, t);
-view(net)
+net = fitnet(50, 'traincgp');
+% p = [trainSet(1:2,:),valSet(1:2,:),testSet(1:2,:)];
+% t = [trainSet(3,:),valSet(3,:),testSet(3,:)];
+% net.divideFcn = 'divideind';
+% net.divideParam.trainInd = 1:1000
+% net.divideParam.valInd = 1001:2000;
+% net.divideParam.testInd = 2001:3000;
+load('data_personal_regression_problem.mat');
+Tnew = (6 * T1 + 6 * T2 + 6 * T3 + 4 * T4 + 2 * T5) / (6 + 6 + 6 + 4 + 2);
+[trInd,valInd,testInd] = dividerand(length(Tnew),1000 / length(Tnew), 1000 / length(Tnew), 1000 / length(Tnew));
+figure
+scatter3(X1(trInd), X2(trInd), Tnew(trInd), '.');
+hold on
+scatter3(X1(valInd), X2(valInd), Tnew(valInd), '.');
+scatter3(X1(testInd), X2(testInd), Tnew(testInd), '.');
+hold off
+p = [[X1(trInd);X2(trInd)],[X1(valInd);X2(valInd)],[X1(testInd);X2(testInd)]];
+t = [Tnew,valSet(3,:),testSet(3,:)];
+net.divideFcn = 'divideind';
+net.divideParam.trainInd = 1:1000
+net.divideParam.valInd = 1001:2000;
+net.divideParam.testInd = 2001:3000;
 
-prev_error = 1e20;
-curr_error = 1e19;
-
-while (curr_error < prev_error)
-    [net, Y, E] = adapt(net, p, t);
-    prev_error = curr_error;
-    curr_error = sse(sim(net, valSet(1:2, :)) - valSet(3, :))
-    curr_error - prev_error
-end
+net = train(net,p,t);
+% p = trainSet(1:2, :);
+% t = trainSet(3, :);
+% net = fitnet(50, 'trainlm');
+% net.inputs{1}.processFcns = {};
+% net.outputs{2}.processFcns = {};
+% net = configure(net, p, t);
+% view(net)
+% 
+% prev_error = 1e20;
+% curr_error = 1e19;
+% 
+% while (curr_error < prev_error)
+%     [net, Y, E] = adapt(net, p, t);
+%     prev_error = curr_error;
+%     curr_error = sse(sim(net, valSet(1:2, :)) - valSet(3, :))
+%     curr_error - prev_error
+% end

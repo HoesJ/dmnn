@@ -196,20 +196,68 @@ scatter3(testSet(1, :), testSet(2, :), testSet(3, :), '.');
 hold off
 
 %% Define network
-p = trainSet(1:2, :);
-t = trainSet(3, :);
-net = fitnet(50, 'trainlm');
-net.inputs{1}.processFcns = {};
-net.outputs{2}.processFcns = {};
-net = configure(net, p, t);
-view(net)
+% p = [trainSet(1:2,:),valSet(1:2,:),testSet(1:2,:)];
+% t = [trainSet(3,:),valSet(3,:),testSet(3,:)];
+% net.divideFcn = 'divideind';
+% net.divideParam.trainInd = 1:1000
+% net.divideParam.valInd = 1001:2000;
+% net.divideParam.testInd = 2001:3000;
+load('data_personal_regression_problem.mat');
+Tnew = (6 * T1 + 6 * T2 + 6 * T3 + 4 * T4 + 2 * T5) / (6 + 6 + 6 + 4 + 2);
+[trInd,valInd,testInd] = dividerand(length(Tnew),1000 / length(Tnew), 1000 / length(Tnew), 1000 / length(Tnew));
+figure
+scatter3(X1(trInd), X2(trInd), Tnew(trInd), '.');
+hold on
+scatter3(X1(valInd), X2(valInd), Tnew(valInd), '.');
+scatter3(X1(testInd), X2(testInd), Tnew(testInd), '.');
+hold off
+p = [[X1(trInd)';X2(trInd)'],[X1(valInd)';X2(valInd)'],[X1(testInd)';X2(testInd)']];
+t = [Tnew(trInd)',Tnew(valInd)',Tnew(testInd)'];
 
-prev_error = 1e20;
-curr_error = 1e19;
+neurons = 10:10:100;
+algs = ["traingd", "traingda", "traincgf", "traincgp", "trainbfg", "trainlm"];
+TFs = ["tansig", "logsig", "radbas","purelin"];
+res_epochs = zeros(length(neurons), length(algs), length(TFs));
+res_testmses = zeros(length(neurons), length(algs), length(TFs));
+res_trainmses = zeros(length(neurons), length(algs), length(TFs));
 
-while (curr_error < prev_error)
-    [net, Y, E] = adapt(net, p, t);
-    prev_error = curr_error;
-    curr_error = sse(sim(net, valSet(1:2, :)) - valSet(3, :))
-    curr_error - prev_error
+for it = 1:10
+for i = 1:length(neurons)
+    for j = 1:length(algs)
+       for k = 1:length(TFs)
+            net = feedforwardnet(neurons(i), algs(j));
+            net.divideFcn = 'divideind';
+            net.divideParam.trainInd = 1:length(trInd);
+            net.divideParam.valInd = (length(trInd)+1):(length(trInd)+length(valInd));
+            net.divideParam.testInd = (length(trInd)+length(valInd)+1):(length(trInd)+length(valInd)+length(testInd));
+            net.layers{1}.transferFcn = TFs(k);
+            
+            [net, tmp] = train(net,p,t);
+            
+            res_epochs(i,j,k) = ((it-1)*res_epochs(i,j,k) + tmp.num_epochs) / it;
+            res_testmses(i,j,k) = ((it-1)*res_testmses(i,j,k) + tmp.best_tperf) / it;
+            res_trainmses(i,j,k) = ((it-1)*res_trainmses(i,j,k) + tmp. best_perf) / it;
+            fprintf("%d - %d - %s, %s", it,neurons(i), algs(j), TFs(k));
+       end
+    end
 end
+end
+
+
+% p = trainSet(1:2, :);
+% t = trainSet(3, :);
+% net = fitnet(50, 'trainlm');
+% net.inputs{1}.processFcns = {};
+% net.outputs{2}.processFcns = {};
+% net = configure(net, p, t);
+% view(net)
+% 
+% prev_error = 1e20;
+% curr_error = 1e19;
+% 
+% while (curr_error < prev_error)
+%     [net, Y, E] = adapt(net, p, t);
+%     prev_error = curr_error;
+%     curr_error = sse(sim(net, valSet(1:2, :)) - valSet(3, :))
+%     curr_error - prev_error
+% end
