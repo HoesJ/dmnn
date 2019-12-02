@@ -237,7 +237,7 @@ for i = 1:length(neurons)
             res_epochs(i,j,k) = ((it-1)*res_epochs(i,j,k) + tmp.num_epochs) / it;
             res_testmses(i,j,k) = ((it-1)*res_testmses(i,j,k) + tmp.best_tperf) / it;
             res_trainmses(i,j,k) = ((it-1)*res_trainmses(i,j,k) + tmp. best_perf) / it;
-            fprintf("%d - %d - %s, %s", it,neurons(i), algs(j), TFs(k));
+            fprintf("%d - %d - %s, %s\n", it,neurons(i), algs(j), TFs(k));
        end
     end
 end
