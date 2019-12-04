@@ -36,10 +36,11 @@ output = TF_out(biases_out+weights_out(1)*out_n1+weights_out(2)*out_n2);
 hold on
 scatter(x,out_n1, 15, 'filled');
 scatter(x,out_n2, 15, 'filled');
-scatter(x,output, 25);
+scatter(x,output, 25, 'linewidth', 2);
 plot(x,y);
 legend('hidden neuron 1', 'hidden neuron 2', 'network estimate', 'sin(x^2)');
 xlabel('x');
 ylabel('y');
 title('Estimate of sin(x^2) with two hidden layers');
 hold off
+net.LW{2,1}

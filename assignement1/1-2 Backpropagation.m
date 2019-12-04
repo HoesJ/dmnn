@@ -8,7 +8,7 @@ y = sin(x.^2); % output
 p = con2seq(x); % converts the input to a best format for the toolbox
 t = con2seq(y); % converts the output to a best format for the toolbox
 
-algs = ["traingd", "traingda", "traincgf", "traincgp", "trainbfg", "trainlm"];
+algs = ['traingd', 'traingda', 'traincgf', 'traincgp', 'trainbfg', 'trainlm'];
 epochs = 5:10:100;
 default = feedforwardnet(50, 'traingd'); % creates a first net with the 'trainlm' algorithm
 nets = cell(length(algs), 1);
@@ -117,62 +117,67 @@ clear all; clc;
 x = linspace(0.05,3*pi,190); % input
 y = sin(x.^2); % output
 
-% algs = ["trainbr"];
-% vars = 0:0.02:0.9;
-vars = 1:10;
-algs = 0:0.02:0.9
-default = feedforwardnet(50, 'traingd'); % creates a first net with the 'trainlm' algorithm
+algs = {'traingd','trainbr', 'traingda', 'traincgf', 'traincgp', 'trainbfg', 'trainlm'};
+vars = 0:0.02:0.9;
+% vars = 2:3:200;
+default = feedforwardnet(15, 'traingd'); % creates a first net with the 'trainlm' algorithm
 
 Rs = zeros(length(vars), length(algs));
 times = zeros(length(vars), length(algs));
 for it = 1:10
 for i = 1:length(algs)
     for j = 1:length(vars)
-        net = feedforwardnet(50, 'trainbr');
+        net = feedforwardnet(15, char(algs(i)));
         net.iw{1, 1} = default.iw{1, 1}; % sets the same weights for both networks
         net.lw{2, 1} = default.lw{2, 1}; % sets the same weights for both networks
         net.b{1} = default.b{1}; % sets the same biases for both networks
         net.b{2} = default.b{2};
-
-        p = con2seq(x);
-        noisy_y = y + algs(i) * randn(1, length(y));
-        t = con2seq(noisy_y);
+        
+        noisy_y = y + vars(j) * randn(1, length(y));
+        p = x;
+        t = noisy_y;
+        if (strcmp(char(algs(i)),'trainbr'))
+            p = con2seq(x);
+            t = con2seq(noisy_y);
+        end
 %         t = con2seq(y);
         net.trainParam.showWindow = 0;
-        net.trainParam.epochs = vars(j); % set the number of epochs for the training (network 1)
+        net.trainParam.epochs = 200; % set the number of epochs for the training (network 1)
         tic
         net = train(net, p, t); % train network 1
         time = toc;
         
         out = sim(net, p); % simulate network 2 with the input vector p
-        
-        [~,~,tmp] = postregm(cell2mat(out), y);
+        if (strcmp(char(algs(i)),'trainbr'))
+            out = cell2mat(out);
+        end
+        [~,~,tmp] = postregm((out), y);
         Rs(j,i) = ((it-1)*Rs(j,i) + tmp) / it;
         times(j,i) = ((it-1)*times(j,i) + time)/it;
-        disp(num2str(algs(i)) + " -- " + num2str(vars(j)))
+        disp(strcat(algs(i),' -- ',num2str(vars(j))));
     end
 end
 end
 %%
-plot(vars, fliplr(Rs), 'linewidth', 2);
-xlabel("noise rate");
-ylabel("Correlation coefficient");
+plot(algs, fliplr(Rs), 'linewidth', 2);
+xlabel('noise rate');
+ylabel('Correlation coefficient');
 % legend(fliplr(algs));
 %%
 load('Rs_epochs.mat');
 figure;
-subplot(2,1,1); plot(2:3:100, fliplr(Rs_epochs), 'linewidth',2); xlabel('epochs'); ylabel("Correlation coefficient"); legend(fliplr(algs)); title('Performance');
-subplot(2,1,2); plot(2:3:100, fliplr(times_epochs), 'linewidth',2); xlabel('epochs'); ylabel("training time [s]"); legend(fliplr(algs)); title('Time');
+subplot(2,1,1); plot(2:3:100, fliplr(Rs_epochs), 'linewidth',2); xlabel('epochs'); ylabel('Correlation coefficient'); legend(fliplr(algs)); title('Performance');
+subplot(2,1,2); plot(2:3:100, fliplr(times_epochs), 'linewidth',2); xlabel('epochs'); ylabel('training time [s]'); legend(fliplr(algs)); title('Time');
 
 load('Rs_noise.mat');
 figure;
-subplot(2,1,1); plot(0.1:0.02:0.9,fliplr(Rs_noise_10ep),'linewidth',2); xlabel("noise rate"); ylabel("Correlation coefficient"); legend(fliplr(algs)); title('Training using 10 epochs');
-subplot(2,1,2); plot(0.1:0.02:0.9,fliplr(Rs_noise_40ep),'linewidth',2); xlabel("noise rate"); ylabel("Correlation coefficient"); legend(fliplr(algs)); title('Training using 40 epochs');
+subplot(2,1,1); plot(0.1:0.02:0.9,fliplr(Rs_noise_10ep),'linewidth',2); xlabel('noise rate'); ylabel('Correlation coefficient'); legend(fliplr(algs)); title('Training using 10 epochs');
+subplot(2,1,2); plot(0.1:0.02:0.9,fliplr(Rs_noise_40ep),'linewidth',2); xlabel('noise rate'); ylabel('Correlation coefficient'); legend(fliplr(algs)); title('Training using 40 epochs');
 
 load('Rs_bayes.mat');
 figure;
 % subplot(2,1,1); plot(2:3:100, Rs_bayes_epochs, 2:3:100, Rs_bayes_epochs_500, 'linewidth', 2);
-subplot(2,1,2); plot(0:0.02:0.9,Rs_bayes_noise_3ep190p,0:0.02:0.9,Rs_bayes_noise_10ep190p,'linewidth',2); xlabel("noise rate"); ylabel("Correlation coefficient"); legend('3 epochs', '10 epochs'); title('Bayesian learning with noise');
+subplot(2,1,2); plot(0:0.02:0.9,Rs_bayes_noise_3ep190p,0:0.02:0.9,Rs_bayes_noise_10ep190p,'linewidth',2); xlabel('noise rate'); ylabel('Correlation coefficient'); legend('3 epochs', '10 epochs'); title('Bayesian learning with noise');
 
 %% personal regression example
 load('data_personal_regression_problem.mat');
@@ -223,8 +228,8 @@ p = [[X1(trInd)';X2(trInd)'],[X1(valInd)';X2(valInd)'],[X1(testInd)';X2(testInd)
 t = [Tnew(trInd)',Tnew(valInd)',Tnew(testInd)'];
 
 neurons = 10:10:100;
-algs = ["traingd", "traingda", "traincgf", "traincgp", "trainbfg", "trainlm"];
-TFs = ["tansig", "logsig", "radbas","purelin"];
+algs = ['traingd', 'traingda', 'traincgf', 'traincgp', 'trainbfg', 'trainlm'];
+TFs = ['tansig', 'logsig', 'radbas','purelin'];
 res_epochs = zeros(length(neurons), length(algs), length(TFs));
 res_testmses = zeros(length(neurons), length(algs), length(TFs));
 res_trainmses = zeros(length(neurons), length(algs), length(TFs));
@@ -245,7 +250,7 @@ for i = 1:length(neurons)
             res_epochs(i,j,k) = ((it-1)*res_epochs(i,j,k) + tmp.num_epochs) / it;
             res_testmses(i,j,k) = ((it-1)*res_testmses(i,j,k) + tmp.best_tperf) / it;
             res_trainmses(i,j,k) = ((it-1)*res_trainmses(i,j,k) + tmp. best_perf) / it;
-            fprintf("%d - %d - %s, %s\n", it,neurons(i), algs(j), TFs(k));
+            fprintf('%d - %d - %s, %s\n', it,neurons(i), algs(j), TFs(k));
        end
     end
 end
