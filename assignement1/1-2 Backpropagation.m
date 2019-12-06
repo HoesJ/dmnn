@@ -276,8 +276,12 @@ end
 TFs = {'tansig', 'logsig', 'radbas'};
 load('personal_regression_run_reduced.mat');
 res_testmses = permute(res_testmses, [1,3,2]);
+res_epochs = permute(res_epochs, [1,3,2]);
 figure;
-semilogy(10:10:100, res_testmses(:,:,6), 'linewidth', 2); xlabel('neurons'); ylabel('validation set MSE'); legend(TFs); title('Networks trained with trainlm');
+semilogy(10:10:100, res_testmses(:,:,6), 'linewidth', 2,'marker', '+'); xlabel('neurons');ylabel('validation set MSE'); legend(TFs); title('Networks trained with trainlm');
+%  text(10:10:100, res_testmses(:,1,6), num2str(res_epochs(:,1,6)))
+
+
 
 % figure(1); 
 % hold on;
