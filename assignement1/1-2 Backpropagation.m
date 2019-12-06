@@ -227,32 +227,29 @@ hold off
 p = [[X1(trInd)';X2(trInd)'],[X1(valInd)';X2(valInd)'],[X1(testInd)';X2(testInd)']];
 t = [Tnew(trInd)',Tnew(valInd)',Tnew(testInd)'];
 
-neurons = 10:10:100;
-algs = ['traingd', 'traingda', 'traincgf', 'traincgp', 'trainbfg', 'trainlm'];
-TFs = ['tansig', 'logsig', 'radbas'];
-res_epochs = zeros(length(neurons), length(algs), length(TFs));
-res_testmses = zeros(length(neurons), length(algs), length(TFs));
-res_trainmses = zeros(length(neurons), length(algs), length(TFs));
+% neurons = 10:10:100;
+% res_epochs = zeros(length(neurons), length(algs), length(TFs));
+% res_valmses = zeros(length(neurons), length(algs), length(TFs));
+% res_trainmses = zeros(length(neurons), length(algs), length(TFs));
+structures = {[30 30],[50 50],[100 100],[100, 50], [50,20], [30 30 30], [50 50 50], [100 100 100], [100 50 20], [50 20 5]};
+res_epochs = zeros(length(structures),1)
+res_valmses = zeros(length(structures),1)
+res_trainmses = zeros(length(structures),1)
 
 for it = 1:10
-for i = 1:length(neurons)
-    for j = 1:length(algs)
-       for k = 1:length(TFs)
-            net = feedforwardnet(neurons(i), algs(j));
-            net.divideFcn = 'divideind';
-            net.divideParam.trainInd = 1:length(trInd);
-            net.divideParam.valInd = (length(trInd)+1):(length(trInd)+length(valInd));
-            net.divideParam.testInd = (length(trInd)+length(valInd)+1):(length(trInd)+length(valInd)+length(testInd));
-            net.layers{1}.transferFcn = TFs(k);
-            
-            [net, tmp] = train(net,p,t);
-            
-            res_epochs(i,j,k) = ((it-1)*res_epochs(i,j,k) + tmp.num_epochs) / it;
-            res_testmses(i,j,k) = ((it-1)*res_testmses(i,j,k) + tmp.best_tperf) / it;
-            res_trainmses(i,j,k) = ((it-1)*res_trainmses(i,j,k) + tmp. best_perf) / it;
-            fprintf('%d - %d - %s, %s\n', it,neurons(i), algs(j), TFs(k));
-       end
-    end
+for i = 1:length(structures)
+    net = feedforwardnet(cell2mat(structures(i)), 'trainlm');
+    net.divideFcn = 'divideind';
+    net.divideParam.trainInd = 1:length(trInd);
+    net.divideParam.valInd = (length(trInd)+1):(length(trInd)+length(valInd));
+    net.divideParam.testInd = (length(trInd)+length(valInd)+1):(length(trInd)+length(valInd)+length(testInd));
+
+    [net, tmp] = train(net,p,t);
+
+    res_epochs(i) = ((it-1)*res_epochs(i) + tmp.num_epochs) / it;
+    res_valmses(i) = ((it-1)*res_valmses(i) + tmp.best_vperf) / it;
+    res_trainmses(i) = ((it-1)*res_trainmses(i) + tmp. best_perf) / it;
+    fprintf('%d - %s\n', it,mat2str(cell2mat(structures(i))));
 end
 end
 
