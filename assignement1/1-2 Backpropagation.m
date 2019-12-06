@@ -112,44 +112,44 @@ for i = 1:length(numdatas)
 end
 
 %% Compare training to vars
-x = linspace(0.05,3*pi,75); % input
+x = linspace(0.05,3*pi,190); % input
 y = sin(x.^2); % output
 
-algs = {'traingd', 'traingda', 'traincgf', 'traincgp', 'trainbfg', 'trainlm'};
+algs = {'traingd', 'traingda', 'traincgf', 'traincgp', 'trainbfg', 'trainlm', 'trainbr'};
 vars = 0:0.02:0.9;
 % vars = 2:3:200;
-default = feedforwardnet(50, 'traingd'); % creates a first net with the 'trainlm' algorithm
+default = feedforwardnet(10, 'traingd'); % creates a first net with the 'trainlm' algorithm
 
 Rs = zeros(length(vars), length(algs));
 times = zeros(length(vars), length(algs));
 for it = 1:10
 for i = 1:length(algs)
     for j = 1:length(vars)
-        net = feedforwardnet(50, char(algs(i)));
+        net = feedforwardnet(10, char(algs(i)));
         net.iw{1, 1} = default.iw{1, 1}; % sets the same weights for both networks
         net.lw{2, 1} = default.lw{2, 1}; % sets the same weights for both networks
         net.b{1} = default.b{1}; % sets the same biases for both networks
         net.b{2} = default.b{2};
         
         noisy_y = y + vars(j) * randn(1, length(y));
-        p = con2seq(x);
-        t = con2seq(noisy_y);
-%         if (strcmp(char(algs(i)),'trainbr'))
-%             p = con2seq(x);
-%             t = con2seq(noisy_y);
-%         end
+        p = (x);
+        t = (noisy_y);
+        if (strcmp(char(algs(i)),'trainbr'))
+            p = con2seq(x);
+            t = con2seq(noisy_y);
+        end
 %         t = con2seq(y);
         net.trainParam.showWindow = 0;
-        net.trainParam.epochs = 40; % set the number of epochs for the training (network 1)
+        net.trainParam.epochs = 200; % set the number of epochs for the training (network 1)
         tic
         net = train(net, p, t); % train network 1
         time = toc;
         
         out = sim(net, p); % simulate network 2 with the input vector p
-%         if (strcmp(char(algs(i)),'trainbr'))
-%             out = cell2mat(out);
-%         end
-        [~,~,tmp] = postregm(cell2mat(out), y);
+        if (strcmp(char(algs(i)),'trainbr'))
+            out = cell2mat(out);
+        end
+        [~,~,tmp] = postregm((out), y);
         Rs(j,i) = ((it-1)*Rs(j,i) + tmp) / it;
         times(j,i) = ((it-1)*times(j,i) + time)/it;
         disp(strcat(algs(i),' -- ',num2str(vars(j))));
@@ -157,7 +157,7 @@ for i = 1:length(algs)
 end
 end
 %%
-plot(algs, fliplr(Rs), 'linewidth', 2);
+plot(vars, fliplr(Rs), 'linewidth', 2);
 xlabel('noise rate');
 ylabel('Correlation coefficient');
 % legend(fliplr(algs));
