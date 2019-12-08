@@ -1,18 +1,18 @@
-d = 15;                % dimension
-R = 12 ;              % domain radius
-
+d = 5;                % dimension
+R = 10 ;              % domain radius
+d = min(d,9)
 % DATASETS
-n_train = 10000 ;                            % training set size
+n_train = 5000 ;                            % training set size
 n_test  = 500  ;                            % test set size
 
 s_train = .1 ;                              % noise standard deviation of the training set
 s_test  = .0 ;                              % noise standard deviation of the test set
 
 % POLYNOMIAL FITTING
-p = 5 ;                % order of the polynomial (the total number of model 
+p = 10 ;                % order of the polynomial (the total number of model 
                                             % parameters will be a combination of d+p out of p)
 % NEURAL NETWORK
-n_neurons = [4,2] ;                         % number of neurons per hidden layer
+n_neurons = [10,10] ;                         % number of neurons per hidden layer
 
 % INPUT
 Train_input  = randsphere(n_train, d, R) ;                      % samples training set on the hyper-sphere 
@@ -69,3 +69,4 @@ fprintf('%%%%  RMSE (Train):            %3.2e          %3.2e         %%%% \n', r
 fprintf('%%%%  RMSE (Test):             %3.2e          %3.2e         %%%% \n', rmse_poly_test, rmse_nn_test) ;
 fprintf('%%%%  Training time [s]:       %3.2e          %3.2e         %%%% \n', time_poly, time_nn) ;
 fprintf('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n') ;
+%% Poly params
