@@ -231,10 +231,10 @@ t = [Tnew(trInd)',Tnew(valInd)',Tnew(testInd)'];
 % res_epochs = zeros(length(neurons), length(algs), length(TFs));
 % res_valmses = zeros(length(neurons), length(algs), length(TFs));
 % res_trainmses = zeros(length(neurons), length(algs), length(TFs));
-structures = {[30 30],[50 50],[100 100],[100, 50], [50,20], [30 30 30], [50 50 50], [100 100 100], [100 50 20], [50 20 5]};
-res_epochs = zeros(length(structures),1)
-res_valmses = zeros(length(structures),1)
-res_trainmses = zeros(length(structures),1)
+structures = {[30 30],[50 50],[100 100],[100, 50], [50,20], [30 30 30], [50 50 50], [80 50 20], [50 20 5]};
+res_epochs = zeros(length(structures),1);
+res_valmses = zeros(length(structures),1);
+res_trainmses = zeros(length(structures),1);
 
 for it = 1:10
 for i = 1:length(structures)
@@ -243,13 +243,14 @@ for i = 1:length(structures)
     net.divideParam.trainInd = 1:length(trInd);
     net.divideParam.valInd = (length(trInd)+1):(length(trInd)+length(valInd));
     net.divideParam.testInd = (length(trInd)+length(valInd)+1):(length(trInd)+length(valInd)+length(testInd));
-
-    [net, tmp] = train(net,p,t);
+    net.trainParam.epochs = 200;
+    [net, tmp] = train(net,p,t, 'useParallel', 'yes', 'showResources', 'yes');
 
     res_epochs(i) = ((it-1)*res_epochs(i) + tmp.num_epochs) / it;
     res_valmses(i) = ((it-1)*res_valmses(i) + tmp.best_vperf) / it;
     res_trainmses(i) = ((it-1)*res_trainmses(i) + tmp. best_perf) / it;
     fprintf('%d - %s\n', it,mat2str(cell2mat(structures(i))));
+    save('backup_pers_reg', 'res_epochs','res_valmses', 'res_trainmses');
 end
 end
 

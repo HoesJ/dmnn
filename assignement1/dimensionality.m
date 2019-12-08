@@ -1,18 +1,27 @@
-d = 15;                % dimension
-R = 12 ;              % domain radius
+dimensions = 1:10;
+archs = {[8,4,2],[10,5],[10,7,5],[10,10]};
+nn_rmses = zeros(length(dimensions), length(archs));
+nn_nb = zeros(length(dimensions), length(archs));
+nn_ti = zeros(length(dimensions), length(archs));
+
+for it = 1:10
+for i = 1:length(dimensions)
+for j = 1:length(archs)
+d = 5;                % dimension
+R = 5 ;              % domain radius
 
 % DATASETS
-n_train = 10000 ;                            % training set size
-n_test  = 500  ;                            % test set size
+n_train = 15000 ;                            % training set size
+n_test  = 1000  ;                            % test set size
 
 s_train = .1 ;                              % noise standard deviation of the training set
 s_test  = .0 ;                              % noise standard deviation of the test set
 
 % POLYNOMIAL FITTING
-p = 5 ;                % order of the polynomial (the total number of model 
+p = 1 ;                % order of the polynomial (the total number of model 
                                             % parameters will be a combination of d+p out of p)
 % NEURAL NETWORK
-n_neurons = [4,2] ;                         % number of neurons per hidden layer
+n_neurons = cell2mat(archs(j)) ;                         % number of neurons per hidden layer
 
 % INPUT
 Train_input  = randsphere(n_train, d, R) ;                      % samples training set on the hyper-sphere 
@@ -39,7 +48,7 @@ rmse_poly_test = 1/n_test*sqrt(sum((Poly_test_output-Test_output).^2)) ;        
 
 % NN FITING
 mdl_nn = feedforwardnet(n_neurons,'trainlm') ;                              % creates the feedforward neural network
-mdl_nn.trainParam.showWindow = false ;                                      % avoid plotting output window
+mdl_nn.trainParam.showWindow = true ;                                      % avoid plotting output window
 tic ;                                                                       % starts the timer for the training of the neural network
 mdl_nn = train(mdl_nn,Train_input',Train_output') ;                         % trains the network
 time_nn = toc ;                                                             % stops the timer and saves the training time of the neural network
@@ -55,17 +64,40 @@ n_params_poly = nchoosek(d+p,p) ;                                               
 n_params_nn   = sum(n_neurons) + sum([d n_neurons 1 0].*[0 d n_neurons 1]) ;        % number of parameters for the neural network model
 
 % PRINT
-fprintf('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n') ;
-fprintf('%%%%  PROBLEM                                                     %%%% \n') ;
-fprintf('%%%%  Dimension: %2i                                               %%%% \n',d) ;
-fprintf('%%%%  Domain:  radius=%2.1f      volume=%2.2e                    %%%% \n',R,vol) ;
-fprintf('%%%%  Training set size: %i                                     %%%% \n',n_train) ;
-fprintf('%%%%  Test set size: %i                                          %%%% \n',n_test) ;
-fprintf('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n') ;
-fprintf('%%%%                           POLYNOMIAL        NEURAL NETWORK   %%%% \n') ;
-fprintf('%%%%  Number of parameters:    %4i             %3i               %%%% \n', n_params_poly, n_params_nn) ;
+% fprintf('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n') ;
+% fprintf('%%%%  PROBLEM                                                     %%%% \n') ;
+% fprintf('%%%%  Dimensio                        %%%% \n',d) ;
+% fprintf('%%%%  Domain:  radius=%2.1f      volume=%2.2e                    %%%% \n',R,vol) ;
+% fprintf('%%%%  Training set size: %i                                     %%%% \n',n_train) ;
+% fprintf('%%%%  Test set size: %i                                          %%%% \n',n_test) ;
+% fprintf('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n') ;
+% fprintf('%%%%                           POLYNOMIAL        NEURAL NETWORK   %%%% \n') ;
+% fprintf('%%%%  Number of parameters:    %4i             %3i               %%%% \n', n_params_poly, n_params_nn) ;
 fprintf('%%%%  Datapoints/parameter:    %4.1f             %4.1f            %%%% \n', n_train/n_params_poly, n_train/n_params_nn) ;
-fprintf('%%%%  RMSE (Train):            %3.2e          %3.2e         %%%% \n', rmse_poly_train, rmse_nn_train) ;
-fprintf('%%%%  RMSE (Test):             %3.2e          %3.2e         %%%% \n', rmse_poly_test, rmse_nn_test) ;
+% fprintf('%%%%  RMSE (Train):            %3.2e          %3.2e         %%%% \n', rmse_poly_train, rmse_nn_train) ;
+% fprintf('%%%%  RMSE (Test):             %3.2e          %3.2e         %%%% \n', rmse_poly_test, rmse_nn_test) ;
 fprintf('%%%%  Training time [s]:       %3.2e          %3.2e         %%%% \n', time_poly, time_nn) ;
-fprintf('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n') ;
+% fprintf('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n') ;
+
+nn_rmses(i,j) = (nn_rmses(i,j) * (it-1) +rmse_nn_test) / it;
+nn_nb(i,j) = (nn_nb(i,j) * (it-1) +n_params_nn) / it;
+nn_ti(i,j) = (nn_ti(i,j) * (it-1) +time_nn) / it;
+
+end
+end
+end
+%% PLOT
+load('curse_poly.mat');
+load('curse_nn.mat');
+poly_best_nb = zeros(10,1);
+poly_best_ti = zeros(10,1);
+for i = 1:10
+    poly_best_nb(i) = poly_nb(i, 5);
+    poly_best_ti(i) = poly_ti(i, 5);
+end
+figure
+% plot number of paramters
+subplot(2,2,[1,2]); plot(1:10,poly_best_rmses,1:10,nn_rmses,'linewidth', 2, 'marker', '+'); ylabel('RMSE'), xlabel('Dimension');title('A) Performance'); legend('Poly optimal order', '[8,4,2]','[10,5]','[10,7,5]','[10,10]');
+subplot(2,2,3); plot(1:10,poly_best_nb,1:10,nn_nb,'linewidth', 2, 'marker', '+'); ylabel('# parameters'), xlabel('Dimension');title('B) Number of parameters');legend('Poly 5th order', '[8,4,2]','[10,5]','[10,7,5]','[10,10]');
+subplot(2,2,4); plot(1:10,poly_best_ti,1:10,nn_ti,'linewidth', 2, 'marker', '+'); ylabel('time'), xlabel('Dimension');title('C) Training time');legend('Poly 5th order', '[8,4,2]','[10,5]','[10,7,5]','[10,10]');
+
