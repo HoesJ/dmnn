@@ -162,7 +162,6 @@ xlabel('noise rate');
 ylabel('Correlation coefficient');
 legend(fliplr(algs));
 %%
-algs = {'traingd', 'traingda', 'traincgf', 'traincgp', 'trainbfg', 'trainlm'};
 load('Rs_epochs.mat');
 figure;
 subplot(2,1,1); plot(2:3:100, fliplr(Rs_epochs), 'linewidth',2); xlabel('epochs'); ylabel('Correlation coefficient'); legend(fliplr(algs)); title('Performance'); ylim([0,1]);
@@ -176,10 +175,9 @@ subplot(2,2,3); plot(0.1:0.02:0.9,fliplr(Rs_noise_10ep75p),'linewidth',2); xlabe
 subplot(2,2,4); plot(0.1:0.02:0.9,fliplr(Rs_noise_40ep75p),'linewidth',2); xlabel('noise rate'); ylabel('Correlation coefficient'); legend(fliplr(algs)); title('40 epochs and 75 points'); ylim([0,1]);
 
 load('Rs_bayes.mat');
-algs = {'traingd', 'traingda', 'traincgf', 'traincgp', 'trainbfg', 'trainlm', 'trainbr'};
 figure;
 % subplot(2,1,1); plot(2:3:100, Rs_bayes_epochs, 2:3:100, Rs_bayes_epochs_500, 'linewidth', 2);
-subplot(2,1,2); plot(0:0.02:0.9,fliplr(Rs_bayes_noise),'linewidth',2); xlabel('noise rate'); ylabel('Correlation coefficient'); legend(fliplr(algs)); title('B) Bayesian learning with noise'); ylim([0,1]);
+subplot(2,1,2); plot(0:0.02:0.9,fliplr(Rs_bayes_noise),'linewidth',2); xlabel('noise rate'); ylabel('Correlation coefficient'); legend(); title('Bayesian learning with noise'); ylim([0,1]);
 
 %% personal regression example
 load('data_personal_regression_problem.mat');
