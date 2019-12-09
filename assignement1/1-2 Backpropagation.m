@@ -110,6 +110,43 @@ for i = 1:length(numdatas)
     plot(x, y, 'bx', x, cell2mat(a), 'r');
     title(numdatas(i));
 end
+%% Overparamaterised Bayes
+x = linspace(0.05,3*pi,190); % input
+y = sin(x.^2); % output
+
+vars = 0:0.02:0.9;
+% vars = 2:3:200;
+default = feedforwardnet(500, 'traingd'); % creates a first net with the 'trainlm' algorithm
+
+Rs = zeros(length(vars));
+times = zeros(length(vars));
+for it = 1:10
+    for j = 1:length(vars)
+        net = feedforwardnet(500, 'trainbr');
+        net.iw{1, 1} = default.iw{1, 1}; % sets the same weights for both networks
+        net.lw{2, 1} = default.lw{2, 1}; % sets the same weights for both networks
+        net.b{1} = default.b{1}; % sets the same biases for both networks
+        net.b{2} = default.b{2};
+        
+        noisy_y = y + vars(j) * randn(1, length(y));
+        p = con2seq(x);
+        t = con2seq(noisy_y);
+        net.trainParam.showWindow = 1;
+        net.trainParam.epochs = 200; % set the number of epochs for the training (network 1)
+        tic
+        net = train(net, p, t); % train network 1
+        time = toc;
+        
+        out = sim(net, p); % simulate network 2 with the input vector p
+        out = cell2mat(out);
+
+        [~,~,tmp] = postregm((out), y);
+        Rs(j,i) = ((it-1)*Rs(j,i) + tmp) / it;
+        times(j,i) = ((it-1)*times(j,i) + time)/it;
+        disp(strcat(num2str(it),' -- ',num2str(vars(j))));
+    end
+end
+end
 
 %% Compare training to vars
 x = linspace(0.05,3*pi,190); % input
@@ -233,7 +270,7 @@ t = [Tnew(trInd)',Tnew(valInd)',Tnew(testInd)'];
 % res_epochs = zeros(length(neurons), length(algs), length(TFs));
 % res_valmses = zeros(length(neurons), length(algs), length(TFs));
 % res_trainmses = zeros(length(neurons), length(algs), length(TFs));
-structures = {[30 30],[50 50],[100 100],[100, 50], [50,20], [30 30 30], [50 50 50], [80 50 20], [50 20 5]};
+structures = {[30 30],[50 50],[80 80],[80, 50], [50,20], [30 30 30], [50 50 50], [80 50 20], [50 20 5]};
 res_epochs = zeros(length(structures),1);
 res_valmses = zeros(length(structures),1);
 res_trainmses = zeros(length(structures),1);
