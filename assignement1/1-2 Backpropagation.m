@@ -246,7 +246,7 @@ for i = 1:length(structures)
     net.divideParam.valInd = (length(trInd)+1):(length(trInd)+length(valInd));
     net.divideParam.testInd = (length(trInd)+length(valInd)+1):(length(trInd)+length(valInd)+length(testInd));
     net.trainParam.epochs = 200;
-    [net, tmp] = train(net,p,t, 'useParallel', 'yes', 'showResources', 'yes');
+    [net, tmp] = train(net,p,t);
 
     res_epochs(i) = ((it-1)*res_epochs(i) + tmp.num_epochs) / it;
     res_valmses(i) = ((it-1)*res_valmses(i) + tmp.best_vperf) / it;
