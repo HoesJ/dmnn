@@ -8,7 +8,7 @@ errs(i) = sqrt(mean(mean((X-Xhat).^2)));
 end
 figure; 
 subplot(2,2,1); bar(d); ylabel('Eigenvalues'); title('A) Gaussian data'); xlim([1 50]);
-subplot(2,2,3); plot(errs, 'linewidth', 2); xlabel('dimensions kept'); ylabel('Error estimate');xlim([1 50]);
+subplot(2,2,3); plot(errs, 'linewidth', 2); xlabel('dimensions kept'); ylabel('reconstruction error (RMSE)');xlim([1 50]);
 
 %% Choles all
 load('choles_all')
@@ -21,7 +21,7 @@ Xhat = E*Z+mu;
 errs(i) = sqrt(mean(mean((X-Xhat).^2)));
 end
 subplot(2,2,2); bar(d); ylabel('Eigenvalues'); title('B) Choles data');xlim([1 21]);
-subplot(2,2,4);plot(errs, 'linewidth', 2);  xlabel('dimensions kept'); ylabel('Error estimate');xlim([1 21]);
+subplot(2,2,4);plot(errs, 'linewidth', 2);  xlabel('dimensions kept'); ylabel('reconstruction error (RMSE)');xlim([1 21]);
 
 %% Matlabs pca
 load('choles_all')

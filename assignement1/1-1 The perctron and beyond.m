@@ -21,8 +21,7 @@ net = configure(net,x,y);
 net.inputs{1}.processFcns = {};
 net.outputs{2}.processFcns = {};
 [net, tr] = train(net, x, y);
-[biases, weights] = hidden_laye
-r_weights(net);
+[biases, weights] = hidden_layer_weights(net);
 TF = hidden_layer_transfer_function(net);
 
 out_n2 = TF(biases(2)+weights(2)*x);

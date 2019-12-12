@@ -2,7 +2,7 @@
 % Cluster data using _k_-means clustering, then plot the cluster regions.
 %%
 % Load Fisher's iris data set.  Use the petal lengths and widths as predictors.
-load fisheriris1
+load fisheriris.mat
 X = meas(:,3:4);
 
 figure;

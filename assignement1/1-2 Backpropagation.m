@@ -283,7 +283,7 @@ for i = 1:length(structures)
     net.divideParam.valInd = (length(trInd)+1):(length(trInd)+length(valInd));
     net.divideParam.testInd = (length(trInd)+length(valInd)+1):(length(trInd)+length(valInd)+length(testInd));
     net.trainParam.epochs = 200;
-    [net, tmp] = train(net,p,t, 'useParallel', 'yes', 'showResources', 'yes');
+    [net, tmp] = train(net,p,t, 'useParallel', 'no', 'showResources', 'yes');
 
     res_epochs(i) = ((it-1)*res_epochs(i) + tmp.num_epochs) / it;
     res_valmses(i) = ((it-1)*res_valmses(i) + tmp.best_vperf) / it;
@@ -314,11 +314,12 @@ end
 
 %%
 TFs = {'tansig', 'logsig', 'radbas'};
+algs = {'traingd', 'traingda', 'traincgf', 'traincgp', 'trainbfg', 'trainlm'};
 load('personal_regression_run_reduced.mat');
-res_testmses = permute(res_testmses, [1,3,2]);
-res_epochs = permute(res_epochs, [1,3,2]);
+% res_testmses = permute(res_testmses, [1,3,2]);
+% res_epochs = permute(res_epochs, [1,3,2]);
 figure;
-semilogy(10:10:100, res_testmses(:,:,6), 'linewidth', 2,'marker', '+'); xlabel('neurons');ylabel('validation set MSE'); legend(TFs); title('Networks trained with trainlm');
+semilogy(10:10:100, res_testmses(:,:,1), 'linewidth', 2,'marker', '+'); xlabel('neurons');ylabel('validation set MSE'); legend(algs); title('Networks trained with tansig');
 %  text(10:10:100, res_testmses(:,1,6), num2str(res_epochs(:,1,6)))
 
 
