@@ -4,25 +4,3 @@
 %       - Bayesian learning 500 neuronen
 %       - Noise on dimensionality
 % 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 

@@ -17,7 +17,7 @@ s_train = noise_s(j) ;                              % noise standard deviation o
 s_test  = .0 ;                              % noise standard deviation of the test set
 
 % POLYNOMIAL FITTING
-p = poly_best_orders(i) ;                % order of the polynomial (the total number of model 
+p = poly_best_orders(d) ;                % order of the polynomial (the total number of model 
                                             % parameters will be a combination of d+p out of p)
 % NEURAL NETWORK
 n_neurons = [10,7,5];                         % number of neurons per hidden layer
