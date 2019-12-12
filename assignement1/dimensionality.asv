@@ -88,8 +88,6 @@ end
 %% PLOT
 load('curse_poly.mat');
 load('curse_nn.mat');
-
-load('curse_noise.mat');
 poly_best_nb = zeros(10,1);
 poly_best_ti = zeros(10,1);
 for i = 1:10
@@ -98,17 +96,12 @@ for i = 1:10
 end
 figure
 % plot number of paramters
-subplot(2,4,[1,2,3]); plot(1:10,poly_best_rmses,1:10,nn_rmses,'linewidth', 2, 'marker', '+'); text(1:10,poly_best_rmses+3e-4,num2str(poly_best_orders')); ylabel('RMSE'), xlabel('Dimension');title('A) Performance'); legend('Poly optimal order', '[8,4,2]','[10,5]','[10,7,5]','[10,10]');
-subplot(2,4,[5,6,7]);
-plot( 0:.1:.9,noise_nn_rmses', 'marker', '+', 'linewidth', 2); hold on;
-plot( 0:.1:.9,noise_poly_rmses','marker', '+', 'linewidth', 2); hold off;
-title('B) Performance with noise'); legend('NN dim 3','NN dim 6','NN dim 9','Poly dim 3', 'poly dim 6', 'poly dim 9'); xlabel('Noise std'); ylabel('RMSE');
-%%
-figure;
-subplot(2,1,1); plot(1:10,poly_best_nb,1:10,nn_nb,'linewidth', 2, 'marker', '+'); ylabel('# parameters'), xlabel('Dimension');title('A) Number of parameters');legend('Poly 5th order', '[8,4,2]','[10,5]','[10,7,5]','[10,10]');
-subplot(2,1,2); plot(1:10,poly_best_ti,1:10,nn_ti,'linewidth', 2, 'marker', '+'); ylabel('time [s]'), xlabel('Dimension');title('B) Training time');legend('Poly 5th order', '[8,4,2]','[10,5]','[10,7,5]','[10,10]');
+subplot(2,4,[1,2,3]); plot(1:10,poly_best_rmses,1:10,nn_rmses,'linewidth', 2, 'marker', '+'); text( ylabel('RMSE'), xlabel('Dimension');title('A) Performance'); legend('Poly optimal order', '[8,4,2]','[10,5]','[10,7,5]','[10,10]');
+subplot(2,4,[5,6]); plot(1:10,poly_best_nb,1:10,nn_nb,'linewidth', 2, 'marker', '+'); ylabel('# parameters'), xlabel('Dimension');title('B) Number of parameters');legend('Poly 5th order', '[8,4,2]','[10,5]','[10,7,5]','[10,10]');
+subplot(2,4,[7,8]); plot(1:10,poly_best_ti,1:10,nn_ti,'linewidth', 2, 'marker', '+'); ylabel('time'), xlabel('Dimension');title('C) Training time');legend('Poly 5th order', '[8,4,2]','[10,5]','[10,7,5]','[10,10]');
 
 %%
+load('curse_noise.mat');
 figure;
 semilogy( 0:.1:.9,noise_nn_rmses', 'marker', '+', 'linewidth', 2); hold on;
 semilogy( 0:.1:.9,noise_poly_rmses','marker', '+', 'linewidth', 2); hold off;
