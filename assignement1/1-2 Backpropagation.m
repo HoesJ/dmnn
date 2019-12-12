@@ -268,18 +268,21 @@ hold off
 p = [[X1(trInd)';X2(trInd)'],[X1(valInd)';X2(valInd)'],[X1(testInd)';X2(testInd)']];
 t = [Tnew(trInd)',Tnew(valInd)',Tnew(testInd)'];
 save('bk_pers_reg_ind', 'trInd','valInd', 'testInd');
-% neurons = 10:10:100;
-% res_epochs = zeros(length(neurons), length(algs), length(TFs));
-% res_valmses = zeros(length(neurons), length(algs), length(TFs));
-% res_trainmses = zeros(length(neurons), length(algs), length(TFs));
-structures = {[30 30],[50 50],[80 80],[80, 50], [50,20], [30 30 30], [50 50 50], [80 50 20], [50 20 5]};
-res_epochs = zeros(length(structures),1);
-res_valmses = zeros(length(structures),1);
-res_trainmses = zeros(length(structures),1);
+
+neurons = 10:10:100;
+algs = {'traingd', 'traingda', 'traincgf', 'traincgp', 'trainbfg', 'trainlm'};
+res_epochs = zeros(length(neurons), length(algs));
+res_valmses = zeros(length(neurons), length(algs));
+res_trainmses = zeros(length(neurons), length(algs));
+% structures = {[30 30],[50 50],[80 80],[80, 50], [50,20], [30 30 30], [50 50 50], [80 50 20], [50 20 5]};
+% res_epochs = zeros(length(structures),1);
+% res_valmses = zeros(length(structures),1);
+% res_trainmses = zeros(length(structures),1);
 
 for it = 1:10
-for i = 1:length(structures)
-    net = feedforwardnet(cell2mat(structures(i)), 'trainlm');
+for i = 1:length(neurons)
+    for j= 1:length(algs)
+    net = feedforwardnet(neurons(i), char(algs(j)));
     net.divideFcn = 'divideind';
     net.divideParam.trainInd = 1:length(trInd);
     net.divideParam.valInd = (length(trInd)+1):(length(trInd)+length(valInd));
@@ -288,11 +291,12 @@ for i = 1:length(structures)
     [net, tmp] = train(net,p,t);
 
 
-    res_epochs(i) = ((it-1)*res_epochs(i) + tmp.num_epochs) / it;
-    res_valmses(i) = ((it-1)*res_valmses(i) + tmp.best_vperf) / it;
-    res_trainmses(i) = ((it-1)*res_trainmses(i) + tmp. best_perf) / it;
-    fprintf('%d - %s\n', it,mat2str(cell2mat(structures(i))));
+    res_epochs(i,j) = ((it-1)*res_epochs(i,j) + tmp.num_epochs) / it;
+    res_valmses(i,j) = ((it-1)*res_valmses(i,j) + tmp.best_vperf) / it;
+    res_trainmses(i,j) = ((it-1)*res_trainmses(i,j) + tmp. best_perf) / it;
+    fprintf('%d - %s - %s\n', it,mat2str(neurons(i)), char(algs(j)));
     save('backup_pers_reg', 'res_epochs','res_valmses', 'res_trainmses');
+end
 end
 end
 
