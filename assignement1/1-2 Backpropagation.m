@@ -302,12 +302,13 @@ end
 
 %% Best model surface
 load('data_personal_regression_problem.mat');
+load('personal_regression_run_final_models2.mat');
 Tnew = (6 * T1 + 6 * T2 + 6 * T3 + 4 * T4 + 2 * T5) / (6 + 6 + 6 + 4 + 2);
 p = randperm(length(Tnew)); Tnew = Tnew(p); X1 = X1(p); X2 = X2(p);
 p = [[X1(trInd)';X2(trInd)'],[X1(valInd)';X2(valInd)'],[X1(testInd)';X2(testInd)']];
 t = [Tnew(trInd)',Tnew(valInd)',Tnew(testInd)'];
 
-load('personal_regression_run_final_models2.mat');
+
 net = feedforwardnet([30,30], 'trainlm');
 net.divideFcn = 'divideind';
 net.divideParam.trainInd = 1:length(trInd);
@@ -319,11 +320,12 @@ out = sim(net,[X1(testInd)';X2(testInd)']);
 %%
 TFs = {'tansig', 'logsig', 'radbas'};
 algs = {'traingd', 'traingda', 'traincgf', 'traincgp', 'trainbfg', 'trainlm'};
-load('personal_regression_run_reduced.mat');
+load('personal_regression_run_reduced2.mat');
+
 % res_testmses = permute(res_testmses, [1,3,2]);
 % res_epochs = permute(res_epochs, [1,3,2]);
 figure;
-semilogy(10:10:100, res_testmses(:,:,1), 'linewidth', 2,'marker', '+'); xlabel('neurons');ylabel('validation set MSE'); legend(algs); title('Networks trained with tansig');
+semilogy(10:10:100, res_valmses, 'linewidth', 2,'marker', '+'); xlabel('neurons');ylabel('validation set MSE'); legend(algs); title('Networks trained with tansig');
 %  text(10:10:100, res_testmses(:,1,6), num2str(res_epochs(:,1,6)))
 
 figure
@@ -336,14 +338,14 @@ title('Advanced architectures');
 figure; subplot(1,3,1); % Original surface
 T = delaunay(X1,X2);
 TO = triangulation(T,X1,X2,Tnew);
-trisurf(TO, 'EdgeColor', 'none'); hold on;
+trisurf(TO, 'EdgeColor', 'none'); zlim([2 5]);hold on;
 scatter3(X1(testInd), X2(testInd), Tnew(testInd), '.r');
 title('Original surface');
 
 subplot(1,3,2); % Best model surface
 T = delaunay(X1(testInd),X2(testInd));
 TO = triangulation(T,X1(testInd),X2(testInd),out');
-trisurf(TO, 'EdgeColor', 'none'); hold on;
+trisurf(TO, 'EdgeColor', 'none'); zlim([2 5]);hold on;
 scatter3(X1(testInd), X2(testInd), Tnew(testInd), '.r');
 title('Approximation');
 
