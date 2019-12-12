@@ -145,7 +145,6 @@ for it = 1:10
         disp(strcat(num2str(it),' -- ',num2str(vars(j))));
     end
 end
-end
 
 %% Compare training to vars
 x = linspace(0.05,3*pi,190); % input
@@ -284,7 +283,7 @@ for i = 1:length(structures)
     net.divideParam.valInd = (length(trInd)+1):(length(trInd)+length(valInd));
     net.divideParam.testInd = (length(trInd)+length(valInd)+1):(length(trInd)+length(valInd)+length(testInd));
     net.trainParam.epochs = 200;
-    [net, tmp] = train(net,p,t, 'useparallel', 'yes');
+    [net, tmp] = train(net,p,t);
 
 
     res_epochs(i) = ((it-1)*res_epochs(i) + tmp.num_epochs) / it;
@@ -297,7 +296,7 @@ end
 
 %% Best model surface
 load('personal_regression_indices');
-net = feedforwardnet('best'), 'trainlm');
+net = feedforwardnet('best', 'trainlm');
 net.divideFcn = 'divideind';
 net.divideParam.trainInd = 1:length(trInd);
 net.divideParam.valInd = (length(trInd)+1):(length(trInd)+length(valInd));
