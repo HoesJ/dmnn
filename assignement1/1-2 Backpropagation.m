@@ -1,4 +1,3 @@
-clear
 
 %% Compare learning algorithms with epochs
 clear all; close all; clc;
@@ -256,7 +255,9 @@ hold off
 % net.divideParam.testInd = 2001:3000;
 load('data_personal_regression_problem.mat');
 Tnew = (6 * T1 + 6 * T2 + 6 * T3 + 4 * T4 + 2 * T5) / (6 + 6 + 6 + 4 + 2);
+p = randperm(length(Tnew)); Tnew = Tnew(p); X1 = X1(p); X2 = X2(p);
 [trInd,valInd,testInd] = dividerand(length(Tnew),1000 / length(Tnew), 1000 / length(Tnew), 1000 / length(Tnew));
+trInd = trInd(1:1000); valInd = valInd(1:1000); testInd = testInd(1:1000);
 figure
 scatter3(X1(trInd), X2(trInd), Tnew(trInd), '.');
 hold on
@@ -265,7 +266,7 @@ scatter3(X1(testInd), X2(testInd), Tnew(testInd), '.');
 hold off
 p = [[X1(trInd)';X2(trInd)'],[X1(valInd)';X2(valInd)'],[X1(testInd)';X2(testInd)']];
 t = [Tnew(trInd)',Tnew(valInd)',Tnew(testInd)'];
-
+save('bk_pers_reg_ind', 'trInd','valInd', 'testInd');
 % neurons = 10:10:100;
 % res_epochs = zeros(length(neurons), length(algs), length(TFs));
 % res_valmses = zeros(length(neurons), length(algs), length(TFs));
@@ -283,7 +284,8 @@ for i = 1:length(structures)
     net.divideParam.valInd = (length(trInd)+1):(length(trInd)+length(valInd));
     net.divideParam.testInd = (length(trInd)+length(valInd)+1):(length(trInd)+length(valInd)+length(testInd));
     net.trainParam.epochs = 200;
-    [net, tmp] = train(net,p,t, 'useParallel', 'no', 'showResources', 'yes');
+    [net, tmp] = train(net,p,t, 'useparallel', 'yes');
+
 
     res_epochs(i) = ((it-1)*res_epochs(i) + tmp.num_epochs) / it;
     res_valmses(i) = ((it-1)*res_valmses(i) + tmp.best_vperf) / it;
@@ -293,25 +295,16 @@ for i = 1:length(structures)
 end
 end
 
-
-% p = trainSet(1:2, :);
-% t = trainSet(3, :);
-% net = fitnet(50, 'trainlm');
-% net.inputs{1}.processFcns = {};
-% net.outputs{2}.processFcns = {};
-% net = configure(net, p, t);
-% view(net)
-% 
-% prev_error = 1e20;
-% curr_error = 1e19;
-% 
-% while (curr_error < prev_error)
-%     [net, Y, E] = adapt(net, p, t);
-%     prev_error = curr_error;
-%     curr_error = sse(sim(net, valSet(1:2, :)) - valSet(3, :))
-%     curr_error - prev_error
-% end
-
+%% Best model surface
+load('personal_regression_indices');
+net = feedforwardnet('best'), 'trainlm');
+net.divideFcn = 'divideind';
+net.divideParam.trainInd = 1:length(trInd);
+net.divideParam.valInd = (length(trInd)+1):(length(trInd)+length(valInd));
+net.divideParam.testInd = (length(trInd)+length(valInd)+1):(length(trInd)+length(valInd)+length(testInd));
+net.trainParam.epochs = 200;
+[net, tmp] = train(net,p,t, 'useparallel', 'yes');
+out = sim(net,[X1(testInd)';X2(testInd)']);
 %%
 TFs = {'tansig', 'logsig', 'radbas'};
 algs = {'traingd', 'traingda', 'traincgf', 'traincgp', 'trainbfg', 'trainlm'};
@@ -322,8 +315,27 @@ figure;
 semilogy(10:10:100, res_testmses(:,:,1), 'linewidth', 2,'marker', '+'); xlabel('neurons');ylabel('validation set MSE'); legend(algs); title('Networks trained with tansig');
 %  text(10:10:100, res_testmses(:,1,6), num2str(res_epochs(:,1,6)))
 
+load('personal_regression_run_final_models.mat');
+res_valmses(7) = 0;
+structures = {'[30 30]','[50 50]','[80 80]','[80, 50]', '[50,20]', '[30 30 30]', '[50 50 50]', '[80 50 20]', '[50 20 5]'};
+bar(res_valmses); xticklabels(structures);
 
+figure; subplot(1,3,1); % Original surface
+T = delaunay(X1,X2);
+TO = triangulation(T,X1,X2,Tnew);
+trisurf(TO, 'EdgeColor', 'none'); hold on;
+scatter3(X1(testInd), X2(testInd), Tnew(testInd), '.r');
 
+subplot(1,3,2); % Best model surface
+T = delaunay(X1(testInd),X2(testInd));
+TO = triangulation(T,X1(testInd),X2(testInd),out);
+trisurf(TO, 'EdgeColor', 'none'); hold on;
+scatter3(X1(testInd), X2(testInd), Tnew(testInd), '.r');
+
+subplot(1,3,3); % Error surface
+T = delaunay(X1(testInd),X2(testInd));
+TO = triangulation(T,X1(testInd),X2(testInd),out-Tnew(testInd));
+trisurf(TO, 'EdgeColor', 'none');
 % figure(1); 
 % hold on;
 % 

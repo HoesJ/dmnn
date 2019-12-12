@@ -32,5 +32,46 @@ axis([-1 1 -1 1]);
 hold on
 plotsom(net.iw{1},net.layers{1}.distances)
 hold off
+%% Banana data set
+load('banana.mat');
 
- 
+s = ceil(sqrt(5*sqrt(size(X,1))));
+s = 12;
+net = newsom(X',[s s],'hextop','linkdist'); 
+
+% plot the data distribution with the prototypes of the untrained network
+figure;subplot(2,2,1);
+plot(X(:,1),X(:,2),'.','markersize',2);
+hold on
+plotsom(net.iw{1},net.layers{1}.distances)
+hold off
+title('initial');
+
+% finally we train the network and see how their position changes
+net.trainParam.epochs = 1;
+net = train(net,X');
+subplot(2,2,2);
+plot(X(:,1),X(:,2),'.','markersize',2);
+hold on
+plotsom(net.iw{1},net.layers{1}.distances)
+hold off
+title('1 epoch');
+
+net.trainParam.epochs = 1;
+net = train(net,X');
+subplot(2,2,3);
+plot(X(:,1),X(:,2),'.','markersize',2);
+hold on
+plotsom(net.iw{1},net.layers{1}.distances)
+hold off
+title('2 epochs');
+
+net.trainParam.epochs = 1;
+net = train(net,X');
+subplot(2,2,4);
+plot(X(:,1),X(:,2),'.','markersize',2);
+hold on
+plotsom(net.iw{1},net.layers{1}.distances)
+hold off
+title('3 epoch');
+%  VErklaring uiterste punten liggennite in de neighbourhoud van de andere
