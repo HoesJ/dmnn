@@ -39,9 +39,8 @@ function PlotClusterinResult(X, IDX)
         hold on;
     end
     hold off;
-    axis equal;
     grid on;
     legend(Legends);
-    legend('Location', 'NorthEastOutside');
+%     legend('Location', 'NorthEastOutside');
 
 end

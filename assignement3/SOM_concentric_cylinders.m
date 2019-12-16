@@ -36,42 +36,51 @@ hold off
 load('banana.mat');
 
 s = ceil(sqrt(5*sqrt(size(X,1))));
-s = 12;
-net = newsom(X',[s s],'hextop','linkdist'); 
+s = 11;
+net = newsom(X',[s s],'hextop','linkdist'); % 'tritop', 'randrop', 'gridtop' / 
 
 % plot the data distribution with the prototypes of the untrained network
-figure;subplot(2,2,1);
-plot(X(:,1),X(:,2),'.','markersize',2);
+figure;
+plot(X(:,1),X(:,2),'.','markersize',5);
 hold on
 plotsom(net.iw{1},net.layers{1}.distances)
 hold off
-title('initial');
+title('Initial SOM prototypes');
 
 % finally we train the network and see how their position changes
 net.trainParam.epochs = 1;
 net = train(net,X');
-subplot(2,2,2);
+figure; subplot(1,3,1);
 plot(X(:,1),X(:,2),'.','markersize',2);
 hold on
 plotsom(net.iw{1},net.layers{1}.distances)
 hold off
 title('1 epoch');
 
-net.trainParam.epochs = 1;
-net = train(net,X');
-subplot(2,2,3);
-plot(X(:,1),X(:,2),'.','markersize',2);
-hold on
-plotsom(net.iw{1},net.layers{1}.distances)
-hold off
-title('2 epochs');
+% pause
 
-net.trainParam.epochs = 1;
+net.trainParam.epochs = 9;
 net = train(net,X');
-subplot(2,2,4);
+subplot(1,3,2);
 plot(X(:,1),X(:,2),'.','markersize',2);
 hold on
 plotsom(net.iw{1},net.layers{1}.distances)
 hold off
-title('3 epoch');
+title('10 epochs');
+
+% pause
+
+net.trainParam.epochs = 90;
+net = train(net,X');
+subplot(1,3,3);
+plot(X(:,1),X(:,2),'.','markersize',2);
+hold on
+plotsom(net.iw{1},net.layers{1}.distances)
+hold off
+title('100 epoch');
 %  VErklaring uiterste punten liggennite in de neighbourhoud van de andere
+
+%%
+subplot(1,3,1); axis equal;
+subplot(1,3,2); axis equal;
+subplot(1,3,3); axis equal;
