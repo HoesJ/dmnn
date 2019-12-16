@@ -44,7 +44,7 @@ for j = 1:length(lags)
        fprintf('cross done: %d\n', size(Xtr,2));
     end
     valmse(:,j,i) = valErr./ split;
-    fprintf('model done: %d - %d\n', neuron, lag);
+    fprintf('%d - model done: %d - %d\n', it, neuron, lag);
 end
 end  
 end
