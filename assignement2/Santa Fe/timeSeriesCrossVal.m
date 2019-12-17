@@ -1,7 +1,7 @@
 load('lasertrain.dat');
 load('laserpred.dat');
 
-lags = 75:5:125;
+lags = 75:5:110;
 neurons = [20,30,50,70,90,110];
 epstep = 20;
 epochs = 50:epstep:210;
