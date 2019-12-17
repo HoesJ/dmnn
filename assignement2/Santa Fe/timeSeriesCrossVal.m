@@ -18,6 +18,7 @@ for j = 1:length(lags)
     valErr = zeros(length(epochs),1);
     
     splitsize = floor(size(X,2)/split);
+    tic;
     for cross = 1:(split-1)
        Xtr = X(:,1:cross*splitsize);
        Ytr = Y(:,1:cross*splitsize);
@@ -47,6 +48,7 @@ for j = 1:length(lags)
     valmse(:,j,i) = valmse(:,j,i) + valErr./ split;
     fprintf('%d - model done: %d - %d\n', it, neuron, lag);
     save('valmse-backup', 'valmse');
+    toc
 end
 end  
 end
