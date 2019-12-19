@@ -1,9 +1,12 @@
 % Generate the data set.
 load('breast.mat');
 x = trainset;
+for i = 1:size(x,2)
+   x(:,i) = (x(:,i) - min(x(:,i))) / (max(x(:,i)) - min(x(:,i)));
+end
 t = labels_train;
 
-% Set up network parameters.
+%% Set up network parameters.
 nin = size(x,2);			% Number of inputs.
 nhidden = 7;			% Number of hidden units.
 nout = 1;			% Number of outputs.
@@ -68,4 +71,4 @@ disp('expect the weights associated with this input would go to')
 disp('zero. However, for any finite data set there may be some chance')
 disp('correlation between x3 and t, and so the corresponding alpha remains')
 disp('finite.')
-
+relevance(:,nhidden-1) = net.alpha(1:30)

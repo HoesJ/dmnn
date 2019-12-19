@@ -97,26 +97,31 @@ figure;
 load('breast_performance_trainbr__1_1_5__ 20__10_15_70.mat');
 pl = performance(1,:,:); semilogy(1:5,pl(:)); hold on;
 load('breast_performance_traincgp__1_1_5__ 20__10_20_50.mat')
-pl = mean(performance,1); semilogy(1:5,pl(:));
+% pl = mean(performance,1); semilogy(1:5,pl(:));
 load('breast_performance_traincgp__1_1_7__ 20__10_20_50.mat')
 pl = mean(performance,1); semilogy(1:7,pl(:));
 load('breast_performance_trainlm__1_1_5__ 20__10_10_50.mat')
 pl = performance(1,:,:); semilogy(1:5,pl(:));
-legend('trainbr', 'traincgp', 'traincgp', 'trainlm');
-
+legend('trainbr', 'traincgp', 'trainlm');
+title('Breast Cancer: 20 neuron models'); xlabel('layers'); ylabel('FICS');
 %% Advanced tests
 load('breast_performance_trainlm__3__ 10_10_50__10_10_50.mat');
+perf_neur = performance;
+load('breast_performance_trainlm__3__ models__10_10_50.mat');
+perf_adv = performance;
+performance = [perf_neur, perf_adv];
+
 mins = zeros(size(performance,2),1);
 for i = 1:size(performance,2)
     mins(i) = min(performance(:,i));
 end
-plot(10:10:50, mins); text(10:10:50,mins,['10';'10';'10';'30';'10']);
-
+bar(mins); xticklabels({'[10,10,10]','[20,20,20]','[30,30,30]','[40,40,40]','[50,50,50]','[50 30 20]','[30 20 10]','[40 20 5]'});text(0.9:7.9,mins+0.005,['10';'10';'10';'30';'10';'10';'10';'10']);
+ylabel('FICS'); title('Breast Cancer: classification error'); xtickangle(45);
 %% Final model on test set
 ber = 0;
 for it = 1:20
 ptr = con2seq(trainset'); ttr = con2seq(labels_train'); ptest = con2seq(testset'); ttest = labels_test';
-net = patternnet([30 30 30], 'trainlm');
+net = patternnet([50 50 50], 'trainlm');
 net.performFcn = 'mse';
 net.layers{end}.transferFcn = 'tansig';
 net.trainParam.epochs = 10;

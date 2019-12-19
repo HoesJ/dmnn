@@ -128,7 +128,7 @@ disp('We can now read off the hyperparameter values corresponding to the')
 disp('three inputs x1, x2 and x3:')
 disp(' ');
 fprintf(1, '    alpha1: %8.5f\n', net.alpha(1));
-fprintf(1, '    alpha2: %8.5f\n', net.alpha(2));
+fprintf(1, '    alpha2: %8.5f\n',  net.alpha(2));
 fprintf(1, '    alpha3: %8.5f\n', net.alpha(3));
 disp(' ');
 disp('Since each alpha corresponds to an inverse variance, we see that the')
