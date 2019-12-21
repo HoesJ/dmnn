@@ -21,8 +21,8 @@ function PlotClusterinResult(X, IDX)
     for i=0:k
         Xi=X(IDX==i,:);
         if i~=0
-            Style = 'x';
-            MarkerSize = 8;
+            Style = 'o';
+            MarkerSize = 6;
             Color = Colors(i,:);
             Legends{end+1} = ['Cluster #' num2str(i)];
         else
@@ -34,7 +34,7 @@ function PlotClusterinResult(X, IDX)
             end
         end
         if ~isempty(Xi)
-            plot(Xi(:,1),Xi(:,2),Style,'MarkerSize',MarkerSize,'Color',Color);
+            plot(Xi(:,1),Xi(:,2),Style,'MarkerSize',MarkerSize,'Color',Color, 'MarkerFaceColor',Color);
         end
         hold on;
     end

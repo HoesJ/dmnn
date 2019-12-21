@@ -95,13 +95,13 @@ end
 %% Initial tests
 figure;
 load('breast_performance_trainbr__1_1_5__ 20__10_15_70.mat');
-pl = performance(1,:,:); semilogy(1:5,pl(:)); hold on;
+pl = performance(1,:,:); semilogy(1:5,pl(:), 'linewidth', 2, 'Marker', '+'); hold on;
 load('breast_performance_traincgp__1_1_5__ 20__10_20_50.mat')
 % pl = mean(performance,1); semilogy(1:5,pl(:));
 load('breast_performance_traincgp__1_1_7__ 20__10_20_50.mat')
-pl = mean(performance,1); semilogy(1:7,pl(:));
+pl = mean(performance,1); semilogy(1:7,pl(:), 'linewidth', 2, 'Marker', '+');
 load('breast_performance_trainlm__1_1_5__ 20__10_10_50.mat')
-pl = performance(1,:,:); semilogy(1:5,pl(:));
+pl = performance(1,:,:); semilogy(1:5,pl(:), 'linewidth', 2, 'Marker', '+');
 legend('trainbr', 'traincgp', 'trainlm');
 title('Breast Cancer: 20 neuron models'); xlabel('layers'); ylabel('FICS');
 %% Advanced tests

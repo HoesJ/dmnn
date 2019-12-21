@@ -1,18 +1,21 @@
 %%
-result = zeros(30,1);
+% result = zeros(30,1);
 %%
-load('breast.mat');
-
+for iter = 27:27
 %% ARD
-load('ard_alpha');
-rel = [relevance_2,relevance_3,relevance_4,relevance_5,relevance_6,relevance_7]; 
-semilogy(rel);
-keep = 17;
-[s2,ind2] = sort(relevance_2); ind2 = sort(ind2(1:keep));
-[s3,ind3] = sort(relevance_3);ind3 = sort(ind3(1:keep));
-[s4,ind4] = sort(relevance_4);ind4 = sort(ind4(1:keep));
-[s5,ind5] = sort(relevance_5);ind5 = sort(ind5(1:keep));
-[s6,ind6] = sort(relevance_6);ind6 = sort(ind6(1:keep));
+s = 0; keep = 30;
+while s ~= iter
+load('breast.mat');
+load('ard_alpha_normalized');
+% rel = [relevance_2,relevance_3,relevance_4,relevance_5,relevance_6,relevance_7]; 
+% semilogy(rel);
+semilogy(relevance);
+
+[s2,ind2] = sort(relevance(:,1)); ind2 = sort(ind2(1:keep));
+[s3,ind3] = sort(relevance(:,2));ind3 = sort(ind3(1:keep));
+[s4,ind4] = sort(relevance(:,3));ind4 = sort(ind4(1:keep));
+[s5,ind5] = sort(relevance(:,4));ind5 = sort(ind5(1:keep));
+[s6,ind6] = sort(relevance(:,5));ind6 = sort(ind6(1:keep));
 
 combined = [];
 for i = 1:30
@@ -23,10 +26,13 @@ end
 
 trainset = trainset(:,combined);
 testset = testset(:,combined);
+keep = keep - 1
+s = length(combined)
+end
 %%
-s = length(combined);
+
 ber = 0;
-for it = 1:20
+for it = 1:10
 ptr = con2seq(trainset'); ttr = con2seq(labels_train'); ptest = con2seq(testset'); ttest = labels_test';
 net = patternnet([50 50 50], 'trainlm');
 net.performFcn = 'mse';
@@ -42,3 +48,16 @@ end
 ber = ber / 20;
 result(s) = ber;
 save('res_backup', 'result');
+
+
+end
+
+%% Plot
+load('ard_res.mat');
+ind = 1:30;
+plot(ind(result~=0), result(result~=0),'linewidth', 2, 'Marker', '+'); xlabel('Input dimension'); ylabel('FICS'); ylim([0 0.2]); title('ARD with [50 50 50]');
+hold on
+load('ard_res_normalized.mat');
+ind = 1:30;
+plot(ind(result~=0), result(result~=0),'linewidth', 2, 'Marker', '+');
+legend('unnormalized', 'normalized');

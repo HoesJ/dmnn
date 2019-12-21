@@ -1,27 +1,58 @@
-clear
-clc
-close all
-
 %Load data
 load('covtype.mat')
 
-
 %% Training the SOM
-x_length = 10;
-y_length = 10;
+r = randperm(size(X,1));
+ind = 0.25*size(X,1);
+X = X(r(1:ind),:);
+Y = Y(r(1:end),:);
+p = ceil(sqrt(5*sqrt(ind)))
+x_length = 44;
+y_length = 44;
 gridsize=[y_length x_length];
 net = newsom(X',gridsize,'hextop','linkdist');
 
-net.trainParam.epochs = 1000;
+net.trainParam.epochs = 200;
 net = train(net,X');
 %% Eval
-% load('SOM_net_12x12.mat');
-% load('SOM_net_3x3.mat');
-% load('SOM_net_10x10.mat');
+load('SOM_net_14x14_200.mat');
+s = 14;
+figure;% subplot(1,2,1);
+plotsomnd(net);
+%%
+subplot(1,2,1);
+coord = net.iw{1};
+epsilon=450;
+MinPts=2;
+IDX=DBSCAN(coord,epsilon,MinPts);
+PlotClusterinResult(hextop([s,s])', IDX);
 
-% Assigning examples to clusters
+title({'Clusters using DBCSAN','\epsilon = 450,MinPoints = 2'});
+%% Correct assignement
 outputs = sim(net,X');
 [~,assignment]  =  max(outputs);
+% plotsomhits(net,X')
+% sum(assignment==3)
+%%
+s = 14;
+grid = hextop([s s]);
+yoff = 0.4;
+xoff = yoff;
+subplot(1,2,2);
+% scatter(grid(1,:), grid(2,:),50,'k.');
+hold on
 
-%Compare clusters with true labels
-ARI=RandIndex(assignment,Y');
+for i = min(Y):max(Y)
+    ind = assignment(Y == i);
+    scatter(grid(1,ind), grid(2,ind),50, 'filled');
+    if (i == 1); grid(2,:) = grid(2,:) + yoff; end
+    if (i == 2); grid(1,:) = grid(1,:) - 2/3 * xoff; grid(2,:) = grid(2,:) - 2/3 * yoff; end
+    if (i == 3); grid(2,:) = grid(2,:) - 2/3 * yoff; end   
+    if (i == 4); grid(1,:) = grid(1,:) + 2/3 * xoff; grid(2,:) = grid(2,:) - 2/3 * yoff; end
+    if (i == 5); grid(1,:) = grid(1,:) + 2/3 * xoff; grid(2,:) = grid(2,:) + 2/3 * yoff; end
+    if (i == 6); grid(2,:) = grid(2,:) + 2/3 * yoff; end   
+end
+hold off
+legend('1','2','3','4','5','6','7')
+title('Real clusters when passed through SOM');
+
