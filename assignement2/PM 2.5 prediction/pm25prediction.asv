@@ -3,10 +3,10 @@ preprocessing
 %%
 
 iteration = 7;
-epstep = 5; epochs = 5:epstep:20;
-lags = 40:5:100;
-neurons = 10:10:20;
-layers = 1:1:10;
+epstep = 5; epochs = 5:epstep:25;
+lags = 25:5:100;
+neurons = 10:10:50;
+layers = 1:1:4;
 
 errors = zeros(length(epochs), length(lags), length(neurons), length(layers));
 times = zeros(length(epochs), length(lags), length(neurons), length(layers));
@@ -95,7 +95,7 @@ for i = 1:length(layers)
    subplot(2,2,i);
    data = zeros(length(lags), length(neurons));
    data = res(:,:,i);
-   plot(lags, data, 'linewidth', 2, 'Marker', '+');
+   plot(lags, data, 'linewidth', );
    legend(num2str(neurons'))
    title(strcat('layers: ',num2str(i)));
 end

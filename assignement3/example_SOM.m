@@ -15,26 +15,25 @@ net = newsom(X',gridsize,'hextop','linkdist');
 net.trainParam.epochs = 200;
 net = train(net,X');
 %% Eval
-load('SOM_net_14x14_200.mat');
-s = 14;
+load('SOM_net_44x44_200_145253.mat')
+s = 44;
 figure;% subplot(1,2,1);
 plotsomnd(net);
 %%
-subplot(1,2,1);
+% subplot(1,2,1);
 coord = net.iw{1};
-epsilon=450;
-MinPts=2;
+epsilon=310;
+MinPts=5;
 IDX=DBSCAN(coord,epsilon,MinPts);
 PlotClusterinResult(hextop([s,s])', IDX);
 
-title({'Clusters using DBCSAN','\epsilon = 450,MinPoints = 2'});
+title({'Clusters using DBCSAN','\epsilon = 310,MinPoints = 5'}, 'fontsize', 18);
 %% Correct assignement
 outputs = sim(net,X');
 [~,assignment]  =  max(outputs);
 % plotsomhits(net,X')
 % sum(assignment==3)
 %%
-s = 14;
 grid = hextop([s s]);
 yoff = 0.4;
 xoff = yoff;
@@ -54,5 +53,6 @@ for i = min(Y):max(Y)
 end
 hold off
 legend('1','2','3','4','5','6','7')
-title('Real clusters when passed through SOM');
+title('Real clusters when passed through SOM', 'fontsize', 18);
+xlim([-1 45]); ylim([-1 38]);
 
