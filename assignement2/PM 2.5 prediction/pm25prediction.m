@@ -4,9 +4,9 @@ preprocessing
 
 iteration = 7;
 epstep = 5; epochs = 5:epstep:20;
-lags = 40:5:100;
+lags = 25:5:100;
 neurons = 10:10:20;
-layers = 1:1:10;
+layers = 5:1:10;
 
 errors = zeros(length(epochs), length(lags), length(neurons), length(layers));
 times = zeros(length(epochs), length(lags), length(neurons), length(layers));
