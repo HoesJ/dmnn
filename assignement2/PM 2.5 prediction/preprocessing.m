@@ -28,13 +28,13 @@ Xtrain = X(1:700);
 Xpred = X(701:1000);
 
 % plot the preprocessed data set
-figure
-plot(Xtrain)
-hold on
-idx = 700:1000;
-plot(idx,[Xtrain(end);Xpred],'-')
-hold off
-xlabel('Data (in Hour)')
-ylabel('PM 2.5 Concentration Index')
-title('PM 2.5 Value of Shanghai, China in 2017')
-legend('Training data','Test Data')
+% figure
+% plot(Xtrain)
+% hold on
+% idx = 700:1000;
+% plot(idx,[Xtrain(end);Xpred],'-')
+% hold off
+% xlabel('Data (in Hour)')
+% ylabel('PM 2.5 Concentration Index')
+% title('PM 2.5 Value of Shanghai, China in 2017')
+% legend('Training data','Test Data')

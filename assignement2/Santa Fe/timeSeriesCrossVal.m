@@ -68,7 +68,7 @@ for i = 1:size(valmse,2)
    end
 end
 % figure; 
-subplot(2,1,1);
+subplot(1,2,1);
 % txt = num2str(eps(:));
 % plot(lags, fliplr(best), 'linewidth', 2); 
 % text(repmat(lags,1,size(best,2)), best(:), txt);
@@ -100,7 +100,7 @@ for n = 1:length(reals)
 end
 testerr =  mse(net,reals,prediction);
 
-subplot(2,1,2);
+subplot(1,2,2);
 plot(prediction);
 hold on
 plot(reals);

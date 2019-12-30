@@ -79,13 +79,13 @@ scatter3(x,y,z,r,c,'s','filled');
 load('Shanghai-10-25_5_100-10_10_50-1_1_4-5_5_25.mat')
 epochs = 5:5:25; lags = 25:5:100; neurons = 10:10:50; layers = 1:1:4;
 
-res = zeros(length(lags), length(neurons), length(layers));
-eps = zeros(length(lags), length(neurons), length(layers));
+res1 = zeros(length(lags), length(neurons), length(layers));
+eps1 = zeros(length(lags), length(neurons), length(layers));
 for i = 1:length(layers)
 for j = 1:length(neurons)
 for k = 1:length(lags)
-    [res(k,j,i),ind] = min(errors(:,k,j,i));
-    eps(k,j,i) = epochs(ind);
+    [res1(k,j,i),ind] = min(errors(:,k,j,i));
+    eps1(k,j,i) = epochs(ind);
 end
 end
 end
@@ -94,8 +94,69 @@ figure
 for i = 1:length(layers)
    subplot(2,2,i);
    data = zeros(length(lags), length(neurons));
-   data = res(:,:,i);
+   data = res1(:,:,i);
    plot(lags, data, 'linewidth', 2, 'Marker', '+');
    legend(num2str(neurons'))
-   title(strcat('layers: ',num2str(i)));
+   title(strcat('PM 2.5: layers ',num2str(i)));
+   xlabel('lags'); ylabel('MSE');
 end
+
+%%
+load('Shanghai-7-25_5_100-10_10_20-5_1_10-5_5_20.mat')
+epochs = 5:5:20; lags = 25:5:100; neurons = 10:10:20; layers = 5:1:10;
+
+res2 = zeros(length(lags), length(neurons), length(layers));
+eps2 = zeros(length(lags), length(neurons), length(layers));
+for i = 1:length(layers)
+for j = 1:length(neurons)
+for k = 1:length(lags)
+    [res2(k,j,i),ind] = min(errors(:,k,j,i));
+    eps2(k,j,i) = epochs(ind);
+end
+end
+end
+
+figure
+for i = 1:length(layers)
+   subplot(3,2,i);
+   data = zeros(length(lags), length(neurons));
+   data = res2(:,:,i);
+   plot(lags, data, 'linewidth', 2, 'Marker', '+');
+   legend(num2str(neurons'))
+   title(strcat('PM 2.5 - layers: ',num2str(layers(i))));
+end
+%%
+res = zeros(size(res2,1),size(res2,2),size(res1,3)+size(res2,3));
+res(:,:,1:4) = res1(:,1:2,:);
+res(:,:,5:10) = res2;
+
+% res = permute(res, [1 3 2]);
+% figure; data = zeros(size(res,1), size(res,3));
+% subplot(1,2,1); data = res(:,:,1); semilogy(lags, data, 'linewidth', 2, 'Marker', '+');
+% subplot(1,2,2); data = res(:,:,2); semilogy(lags, data, 'linewidth', 2, 'Marker', '+');
+lays = zeros(size(res,1),size(res,2));
+ress = zeros(size(res,1),size(res,2));
+for i = 1:size(res,1)
+for j = 1:size(res,2)
+    [ress(i,j),ind] = min(res(i,j,:));
+    lays(i,j) = ind;
+end
+end
+figure;
+subplot(1,2,1);
+plot(lags, ress, 'linewidth', 2, 'Marker', '+');
+text([lags,lags]+1, ress(:),num2str(lays(:)));
+legend('10 neurons', '20 neurons'); title('PM 2.5: layers 1 to 10');
+xlabel('lags'); ylabel('MSE');
+
+%% Test result
+load('shanghai2017.mat');
+preprocessing
+[Xtr, Ytr] = getTimeSeriesTrainData(Xtrain, 80);
+topology = [10, 10, 10];
+alg = 'trainlm';
+net = feedforwardnet(topology, alg);
+net.trainParam.epochs = 10;
+net.trainParam.showWindow = 1;
+net = train(net, con2seq(Xtr),con2seq(Ytr));
+[err, ~] = evalModel(net, Xtr(:,end), Xpred, resfig);

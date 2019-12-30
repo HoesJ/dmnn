@@ -96,21 +96,21 @@ title('Santa Fe laserdata - trainlm (zoom)');
 
 %% plot
 figure;
-subplot(3,1,1);
+subplot(1,3,1);
 plot(20:5:125, lm, 'linewidth', 2, 'marker', '+');
 xlabel('lags');
 legend('20 neurons', '30 neurons', '50 neurons');
 ylabel('MSE');
 title('A) Santa Fe laserdata - trainlm')
 
-subplot(3,1,2);
+subplot(1,3,2);
 plot(20:5:125, cgf, 'linewidth', 2, 'marker', '+');
 xlabel('lags');
 legend('20 neurons', '30 neurons', '50 neurons');
 ylabel('MSE');
 title('B) Santa Fe laserdata - traincgf');
 
-subplot(3,1,3);
+subplot(1,3,3);
 plot(75:5:125, lm(12:end,2), 75:5:125, lm(12:end,3), 80:5:125, cgf(13:end,2), 80:5:125, cgf(13:end,3), 'linewidth', 2, 'marker', '+');
 xlabel('lags');
 xlim([75,140])
