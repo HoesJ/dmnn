@@ -202,7 +202,7 @@ imds.ReadFcn = @(filename)readAndPreprocessImage(filename);
 % network capture basic image features, such as edges and blobs. To see
 % this, visualize the network filter weights from the first convolutional
 % layer. This can help build up an intuition as to why the features
-% extracted from CNNs work so well for image recognition tasks. Note that
+% extracted from CNNs work so well for image recognition tasks. Note that22
 % visualizing deeper layer weights is beyond the scope of this example. You
 % can read more about that in the work of Zeiler and Fergus [4].
 
