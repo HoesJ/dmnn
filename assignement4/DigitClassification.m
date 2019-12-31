@@ -123,5 +123,14 @@ subplot(1,2,1);plot([0.4,0.3,0.2,0.1,0.05],preClassErrs(1:4,:),'linewidth', 2, '
 subplot(1,2,2);plot([0.4,0.3,0.2,0.1,0.05],postClassErrs(1:4,:),'linewidth', 2, 'Marker','+'); xlabel('Sparsity proportion'); ylabel('Correct classificatio [%]'); title('MNIST - 1 layer - Post fine-tuning'); legend('[50]','[75]','[100]','[150]');
 
 figure;
-plot(preClassErrs(5:8,:)');% xticklabels(['[0.3,0.3]','[0.15,0.15]','[0.3,0.1]','[0.4,0.1]','[0.2,0.05]']); xticks([1,2,3,4,5])
+subplot(1,2,1);plot(preClassErrs(5:7,:)', 'linewidth',2,'Marker','+');  xlabel('Sparsity proportion'); ylabel('Correct classificatio [%]'); title('MNIST - 2 layer - Pre fine-tuning'); legend('[100,50]','[100,75]','[75,50]');
+xticks([1,2,3,4,5]); xticklabels({'[0.3,0.3]','[0.15,0.15]','[0.3,0.1]','[0.4,0.1]','[0.2,0.05]'}); xtickangle(45);
+subplot(1,2,2);plot(postClassErrs(5:7,:)', 'linewidth',2,'Marker','+');  xlabel('Sparsity proportion'); ylabel('Correct classificatio [%]'); title('MNIST - 2 layer - Post fine-tuning'); legend('[100,50]','[100,75]','[75,50]');
+xticks([1,2,3,4,5]); xticklabels({'[0.3,0.3]','[0.15,0.15]','[0.3,0.1]','[0.4,0.1]','[0.2,0.05]'}); xtickangle(45); ylim([97,100]);
+
+figure;
+subplot(1,2,1);plot(preClassErrs(8,:)', 'linewidth',2,'Marker','+');  xlabel('Sparsity proportion'); ylabel('Correct classificatio [%]'); title('MNIST - 3 layer - Pre fine-tuning'); legend('[100,75,50]');
+xticks([1,2,3,4,5]); xticklabels({'[0.4,0.2,0.1]','[0.2,0.1,0.05]','[0.1,0.1,0.05]','[0.2,0.2,0.2]','[0.1,0.1,0.1]'}); xtickangle(45);
+subplot(1,2,2);plot(postClassErrs(8,:)', 'linewidth',2,'Marker','+');  xlabel('Sparsity proportion'); ylabel('Correct classificatio [%]'); title('MNIST - 3 layer - Post fine-tuning'); legend('[100,75,50]');
+xticks([1,2,3,4,5]); xticklabels({'[0.4,0.2,0.1]','[0.2,0.1,0.05]','[0.1,0.1,0.05]','[0.2,0.2,0.2]','[0.1,0.1,0.1]'}); xtickangle(45); ylim([97,100]);
 
