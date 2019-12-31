@@ -17,8 +17,8 @@ sparse=[ {0.4,0.3,0.2,0.1,0.05};
 %%
 times = zeros(5,1);
 for it = 1:10
-for i = 1:1
-for j = 1:5
+for i = 8:8
+for j = 4:4
 load('digittrain_dataset');
 layers = cell2mat(structures(i));
 
@@ -36,6 +36,9 @@ for n = 1:length(layers)
         'SparsityProportion',sp, ...
         'ScaleData', false);
     feat = encode(autoenc,feat);
+    
+    figure;
+    plotWeights(autoenc);
     
     if n == 1
         deepnet = autoenc;

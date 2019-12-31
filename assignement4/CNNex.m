@@ -219,102 +219,106 @@ figure
 montage(w1)
 title('First convolutional layer weights')
 
-% %%
-% % Notice how the first layer of the network has learned filters for
-% % capturing blob and edge features. These "primitive" features are then
-% % processed by deeper network layers, which combine the early features to
-% % form higher level image features. These higher level features are better
-% % suited for recognition tasks because they combine all the primitive
-% % features into a richer image representation [5].
-% %
-% % You can easily extract features from one of the deeper layers using the
-% % |activations| method. Selecting which of the deep layers to choose is a
-% % design choice, but typically starting with the layer right before the
-% % classification layer is a good place to start. In |convnet|, the this
-% % layer is named 'fc7'. Let's extract training features using that layer.
-% featureLayer = 'fc7';
-% trainingFeatures = activations(convnet, trainingSet, featureLayer, ...
-%     'MiniBatchSize', 32, 'OutputAs', 'columns');
-% %%
-% % Note that the activations are computed on the GPU and the 'MiniBatchSize'
-% % is set 32 to ensure that the CNN and image data fit into GPU memory.
-% % You may need to lower the 'MiniBatchSize' if your GPU runs out of memory.
-% %
-% % Also, the activations output is arranged as columns. This helps speed-up
-% % the multiclass linear SVM training that follows.
-% 
-% %% Train A Multiclass SVM Classifier Using CNN Features
-% % Next, use the CNN image features to train a multiclass SVM classifier. A
-% % fast Stochastic Gradient Descent solver is used for training by setting
-% % the |fitcecoc| function's 'Learners' parameter to 'Linear'. This helps
-% % speed-up the training when working with high-dimensional CNN feature
-% % vectors, which each have a length of 4096.
-% 
-% % Get training labels from the trainingSet
-% trainingLabels = trainingSet.Labels;
-% 
-% % Train multiclass SVM classifier using a fast linear solver, and set
-% % 'ObservationsIn' to 'columns' to match the arrangement used for training
-% % features.
-% classifier = fitcecoc(trainingFeatures, trainingLabels, ...
-%     'Learners', 'Linear', 'Coding', 'onevsall', 'ObservationsIn', 'columns');
-% 
-% %% Evaluate Classifier
-% % Repeat the procedure used earlier to extract image features from
-% % |testSet|. The test features can then be passed to the classifier to
-% % measure the accuracy of the trained classifier.
-% 
-% % Extract test features using the CNN
-% testFeatures = activations(convnet, testSet, featureLayer, 'MiniBatchSize',32);
-% 
-% % Pass CNN image features to trained classifier
-% predictedLabels = predict(classifier, testFeatures);
-% 
-% % Get the known labels
-% testLabels = testSet.Labels;
-% 
-% % Tabulate the results using a confusion matrix.
-% confMat = confusionmat(testLabels, predictedLabels);
-% 
-% % Convert confusion matrix into percentage form
-% confMat = bsxfun(@rdivide,confMat,sum(confMat,2))
-% %%
-% 
-% % Display the mean accuracy
-% mean(diag(confMat))
-% 
-% %% Try the Newly Trained Classifier on Test Images
-% % You can now apply the newly trained classifier to categorize new images.
-% newImage = fullfile(rootFolder, 'airplanes', 'image_0690.jpg');
-% 
-% % Pre-process the images as required for the CNN
-% img = readAndPreprocessImage(newImage);
-% 
-% % Extract image features using the CNN
-% imageFeatures = activations(convnet, img, featureLayer);
-% %%
-% 
-% % Make a prediction using the classifier
-% label = predict(classifier, imageFeatures)
-% 
-% 
-% %% References
-% % [1] Deng, Jia, et al. "Imagenet: A large-scale hierarchical image
-% % database." Computer Vision and Pattern Recognition, 2009. CVPR 2009. IEEE
-% % Conference on. IEEE, 2009.
-% %
-% % [2] Krizhevsky, Alex, Ilya Sutskever, and Geoffrey E. Hinton. "Imagenet
-% % classification with deep convolutional neural networks." Advances in
-% % neural information processing systems. 2012.
-% %
-% % [3] Vedaldi, Andrea, and Karel Lenc. "MatConvNet-convolutional neural
-% % networks for MATLAB." arXiv preprint arXiv:1412.4564 (2014).
-% %
-% % [4] Zeiler, Matthew D., and Rob Fergus. "Visualizing and understanding
-% % convolutional networks." Computer Vision-ECCV 2014. Springer
-% % International Publishing, 2014. 818-833.
-% %
-% % [5] Donahue, Jeff, et al. "Decaf: A deep convolutional activation feature
-% % for generic visual recognition." arXiv preprint arXiv:1310.1531 (2013).
-% 
-% displayEndOfDemoMessage(mfilename)
+%%
+% Notice how the first layer of the network has learned filters for
+% capturing blob and edge features. These "primitive" features are then
+% processed by deeper network layers, which combine the early features to
+% form higher level image features. These higher level features are better
+% suited for recognition tasks because they combine all the primitive
+% features into a richer image representation [5].
+%
+% You can easily extract features from one of the deeper layers using the
+% |activations| method. Selecting which of the deep layers to choose is a
+% design choice, but typically starting with the layer right before the
+% classification layer is a good place to start. In |convnet|, the this
+% layer is named 'fc7'. Let's extract training features using that layer.
+featureLayer = 'fc7';
+trainingFeatures = activations(convnet, trainingSet, featureLayer, ...
+    'MiniBatchSize', 32, 'OutputAs', 'columns');
+%%
+% Note that the activations are computed on the GPU and the 'MiniBatchSize'
+% is set 32 to ensure that the CNN and image data fit into GPU memory.
+% You may need to lower the 'MiniBatchSize' if your GPU runs out of memory.
+%
+% Also, the activations output is arranged as columns. This helps speed-up
+% the multiclass linear SVM training that follows.
+
+%% Train A Multiclass SVM Classifier Using CNN Features
+% Next, use the CNN image features to train a multiclass SVM classifier. A
+% fast Stochastic Gradient Descent solver is used for training by setting
+% the |fitcecoc| function's 'Learners' parameter to 'Linear'. This helps
+% speed-up the training when working with high-dimensional CNN feature
+% vectors, which each have a length of 4096.
+
+% Get training labels from the trainingSet
+trainingLabels = trainingSet.Labels;
+
+% Train multiclass SVM classifier using a fast linear solver, and set
+% 'ObservationsIn' to 'columns' to match the arrangement used for training
+% features.
+classifier = fitcecoc(trainingFeatures, trainingLabels, ...
+    'Learners', 'Linear', 'Coding', 'onevsall', 'ObservationsIn', 'columns');
+
+%% Evaluate Classifier
+% Repeat the procedure used earlier to extract image features from
+% |testSet|. The test features can then be passed to the classifier to
+% measure the accuracy of the trained classifier.
+
+% Extract test features using the CNN
+testFeatures = activations(convnet, testSet, featureLayer, 'MiniBatchSize',32);
+
+% Pass CNN image features to trained classifier
+predictedLabels = predict(classifier, testFeatures);
+
+% Get the known labels
+testLabels = testSet.Labels;
+
+% Tabulate the results using a confusion matrix.
+confMat = confusionmat(testLabels, predictedLabels);
+
+% Convert confusion matrix into percentage form
+confMat = bsxfun(@rdivide,confMat,sum(confMat,2))
+%%
+
+% Display the mean accuracy
+mean(diag(confMat))
+
+%% Try the Newly Trained Classifier on Test Images
+% You can now apply the newly trained classifier to categorize new images.
+newImage = fullfile(rootFolder, 'airplanes', 'image_0690.jpg');
+
+% Pre-process the images as required for the CNN
+img = readAndPreprocessImage(newImage);
+
+% Extract image features using the CNN
+imageFeatures = activations(convnet, img, featureLayer);
+%%
+
+% Make a prediction using the classifier
+label = predict(classifier, imageFeatures)
+
+
+%% References
+% [1] Deng, Jia, et al. "Imagenet: A large-scale hierarchical image
+% database." Computer Vision and Pattern Recognition, 2009. CVPR 2009. IEEE
+% Conference on. IEEE, 2009.
+%
+% [2] Krizhevsky, Alex, Ilya Sutskever, and Geoffrey E. Hinton. "Imagenet
+% classification with deep convolutional neural networks." Advances in
+% neural information processing systems. 2012.
+%
+% [3] Vedaldi, Andrea, and Karel Lenc. "MatConvNet-convolutional neural
+% networks for MATLAB." arXiv preprint arXiv:1412.4564 (2014).
+%
+% [4] Zeiler, Matthew D., and Rob Fergus. "Visualizing and understanding
+% convolutional networks." Computer Vision-ECCV 2014. Springer
+% International Publishing, 2014. 818-833.
+%
+% [5] Donahue, Jeff, et al. "Decaf: A deep convolutional activation feature
+% for generic visual recognition." arXiv preprint arXiv:1310.1531 (2013).
+
+displayEndOfDemoMessage(mfilename)
+%%%%%%
+% i) layer 2 --> 11x11x3x96 means 96 convolutions to learn in 3 colors for
+% each 11x11 filters
+% ii)

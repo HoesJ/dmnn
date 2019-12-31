@@ -167,7 +167,7 @@ layers = [imageInputLayer([28 28 1])
 % is a full training cycle on the whole training data), and start the
 % training with an initial learning rate of 0.0001.
 options = trainingOptions('sgdm','MaxEpochs',15, ...
-	'InitialLearnRate',0.0001,'OutputFcn',@plotTrainingAccuracy);  
+	'InitialLearnRate',0.0001);%,'OutputFcn',@plotTrainingAccuracy);  
 
 %% Train the Network Using Training Data
 % Train the network you defined in layers, using the training data and the
@@ -218,17 +218,17 @@ accuracy = sum(YTest == TTest)/numel(TTest)
 
 
 
-function plotTrainingAccuracy(info)
-
-persistent plotObj
-
-if info.State == "start"
-    plotObj = animatedline;
-    xlabel("Iteration")
-    ylabel("Training Accuracy")
-elseif info.State == "iteration"
-    addpoints(plotObj,info.Iteration,info.TrainingAccuracy)
-    drawnow limitrate nocallbacks
-end
-
-end
+% function plotTrainingAccuracy(info)
+% 
+% persistent plotObj
+% 
+% if strcmp(info.State,'start')
+%     plotObj = animatedline;
+%     xlabel('Iteration')
+%     ylabel('Training Accuracy')
+% elseif strcmp(info.State,'iteration')
+%     addpoints(plotObj,info.Iteration,info.TrainingAccuracy)
+%     drawnow limitrate nocallbacks
+% end
+% 
+% end
