@@ -4,7 +4,7 @@ digitData = imageDatastore(digitDatasetPath, ...
         'IncludeSubfolders',true,'LabelSource','foldernames');
     
 eps = 5:5:20;
-lns = [0.00001,0.0001, 0.001, 0.005];
+lns = [0.00001,0.0001, 0.001, 0.005, 0.01];
 %%
 % figure;
 % perm = randperm(10000,20);
@@ -126,7 +126,7 @@ for i = 1:length(layers)
         for l = 1:length(lns)
             fprintf('exp %i: eps %i, ln %i\n',i,eps(k), lns(l));
             if (lns(l) == 0.01)
-                options = trainingOptions('sgdm','MaxEpochs',eps(k),'InitialLearnRate',lns(l), 'LearnRateDropFactor',0.5,'LearnRateDropPeriod',2);
+                options = trainingOptions('sgdm','MaxEpochs',eps(k),'InitialLearnRate',lns(l), 'LearnRateDropFactor',0.5,'LearnRateDropPeriod',);
             else
                 options = trainingOptions('sgdm','MaxEpochs',eps(k),'InitialLearnRate',lns(l));
             end
